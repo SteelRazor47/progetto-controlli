@@ -1,6 +1,10 @@
+clc; close all;
+
 W = 1;
 D = 1;
 e_max = 0.1;
+S = 0.15;
+T_a5 = 0.01;
 
 
 beta = 1;
@@ -24,11 +28,36 @@ B_e = [0; 1/J(theta_e)];
 C = [1 0];
 D = 0;
 
-modello = ss(A_e, B_e, C, D);
-G = tf(modello);
+s = tf('s');
 
-figure(1);
-bode(G, {0.5 1e5});
+modello = ss(A_e, B_e, C, D);
+G = zpk(modello);
+
+xi = sqrt(log(S)^2/(pi^2+log(S)^2));
+Mf = xi*100;
+
+omega_cMin = 3 / (T_a5*xi);
+
+
+R1 = 1/(1+2*xi*s/omega_cMin + (s/omega_cMin)^2);
+R2 = 800 / (1+s/1e4);
+R3 = 800 / (1+s/1e4)^2;
+
+Ge1 =  R1 * G;
+Ge2 =  R2 * G;
+Ge3 =  R3 * G;
+
+FF = Ge3 / (1+Ge3);
+
+figure();
+step(W * FF);
+
+
+mappatura_specifiche_bode(G, 'G', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+mappatura_specifiche_bode(Ge1, 'Ge1', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+mappatura_specifiche_bode(Ge2, 'Ge2', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+mappatura_specifiche_bode(Ge3, 'Ge3', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+
 
 %animation(-1.5*pi:0.1:pi/2, 2);
 
@@ -76,6 +105,27 @@ function [x_c, y_c] = findPointOnCircle(P, D, center, radius)
     [x_out, y_out] = circcirc(P(1), P(2), D, center(1), center(2), radius);
     x_c = x_out(1);
     y_c = y_out(1);
+end
+
+function [omega_plot_min, omega_plot_max, omega_cMax] = mappatura_specifiche_bode(GG, titolo, omega_n, A_n, omega_d, A_d, omega_cMin, Mf)
+    figure()
+    omega_plot_min = 1e-4;
+    omega_plot_max = 5e6;
+    omega_cMax = omega_n;
+    [Mag, phase, omega] = bode(GG, {omega_plot_min, omega_plot_max});
+    
+    % Rumore (giallo)
+    patch([omega_n, omega_plot_max, omega_plot_max, omega_n], [-A_n, -A_n, 200, 200], 'y', 'FaceAlpha', 0.3, 'EdgeAlpha', 0.3);
+    
+    % Pulsazione critica (azzurro)
+    patch([omega_plot_min, omega_d, omega_d, omega_cMin, omega_cMin, omega_plot_min], [A_d,A_d, 0,0, -200, -200], 'c', 'FaceAlpha', 0.3, 'EdgeAlpha', 0.3); 
+    grid on, hold on;
+    margin(Mag, phase, omega);
+    
+    % Margine di fase (verde)
+    patch([omega_cMin, omega_cMax, omega_cMax, omega_cMin], [-180 + Mf, -180 + Mf, -270, -270], 'g', 'FaceAlpha', 0.3, 'EdgeAlpha', 0.3); 
+    grid on, hold on;
+    title(titolo);
 end
 
 
