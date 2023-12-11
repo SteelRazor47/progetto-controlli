@@ -26,6 +26,7 @@ omega_e = 0;
 theta_e = pi / 3;
 u_e = 0; % beta * x2 = beta * omega_e = 0
 x_e = [theta_e; omega_e];
+x_sim = x_e;
 
 %In questo caso A_e = [0 1; 0 -1/J(theta_e)]
 A_e = [0 1; -(J(theta_e))^-2 * Jdot(theta_e) * (u_e - beta * omega_e)   -beta/J(theta_e)];
@@ -110,12 +111,42 @@ plot(tt,y_n,'b')
 grid on
 legend('n(t)','y_n(t')
 
+%%
+figure();
+hold on, grid on, zoom on;
+
+for theta = 0:2*pi/10:2*pi
+    x_sim = [theta; 0];
+    out = sim("SdC_progetto.slx");
+    plot(out.y_sim);
+end
+
+%%
+figure();
+hold on, grid on, zoom on;
+
+for vel = 0:1000:10000
+    x_sim = [theta_e; vel];
+    out = sim("SdC_progetto.slx");
+    plot(out.y_sim);
+end
+
+%%
+figure();
+hold on, grid on, zoom on;
+
+for w = 0:2*pi/10:2*pi
+    x_sim = x_e;
+    W = w;
+    out = sim("SdC_progetto.slx");
+    plot(out.y_sim);
+end
 
 %animation(-1.5*pi:0.1:pi/2, 2);
 
 
 
-
+%% Funzioni
 function [] = animation(thetas, figure_n)
     wheel_center = [0 2];
     wheel_r = 0.6;
