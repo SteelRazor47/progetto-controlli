@@ -1,4 +1,5 @@
-clc; close all;
+clc; close all; clear all;
+set(0,'DefaultFigureWindowStyle','docked');
 
 W = 1;
 D = 1;
@@ -11,8 +12,12 @@ beta = 1;
 J0 = 1.7e-4;
 Ji =    [1e-5     7e-5    9e-6    2e-6];
 phi =   [-0.04   2.9     2.8     -2.6];
+k = [1 2 3 4];
 J = @(x) J0 + Ji(1) * cos(x + phi(1))+ Ji(2) * cos(2*x + phi(2))+ Ji(3) * cos(3*x + phi(3))+ Ji(4) * cos(4*x + phi(4));
 Jdot = @(x) -(Ji(1) * sin(x + phi(1))+ Ji(2) * 2 * sin(2*x + phi(2))+ Ji(3) * 3 * sin(3*x + phi(3))+ Ji(4) * 4 * sin(4*x + phi(4)));
+
+DD = @(x) sin(0.1*k(1)*x) + sin(0.1*k(2)*x) + sin(0.1*k(3)*x) + sin(0.1*k(4)*x);
+NN = @(x) sin((5e4)*k(1)*x) + sin((5e4)*k(2)*x) + sin((5e4)*k(3)*x) + sin((5e4)*k(4)*x);
 % x1 = theta, x2 = omega, u = Cm
 % xdot = [ x2; (u - beta * x2) / J(x1) ] = f(x, u)
 % y = x1 = h(x,u)
@@ -31,32 +36,79 @@ D = 0;
 s = tf('s');
 
 modello = ss(A_e, B_e, C, D);
-G = zpk(modello);
+G = tf(modello);
 
 xi = sqrt(log(S)^2/(pi^2+log(S)^2));
 Mf = xi*100;
 
 omega_cMin = 3 / (T_a5*xi);
 
+mappatura_specifiche_bode(G, 'G', 5e4, 65, 0.5, 30, omega_cMin, Mf);
 
-R1 = 1/(1+2*xi*s/omega_cMin + (s/omega_cMin)^2);
-R2 = 800 / (1+s/1e4);
-R3 = 800 / (1+s/1e4)^2;
+phi = deg2rad(-5);
+M_star = 0.31; %circa -10dB
+omega_star = 5e4;
+tau = (cos(phi) - 1/M_star)/(omega_star * sin(phi));
+alpha = (M_star - cos(phi))/(omega_star * sin(phi)) / tau;
 
-Ge1 =  R1 * G;
-Ge2 =  R2 * G;
-Ge3 =  R3 * G;
+ritardo = (1+tau * alpha * s)/(1+tau*s);
+mu = omega_cMin * 1.5;
+R = mu * ritardo;
+LL =  R * G;
 
-FF = Ge3 / (1+Ge3);
+mappatura_specifiche_bode(LL, 'L', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+
+FF = LL / (1+LL);
 
 figure();
-step(W * FF);
+hold on;
+T_simulation = 2*T_a5;
+[y_step,t_step] = step(W*FF, T_simulation);
+plot(t_step,y_step,'b');
+grid on, zoom on, hold on;
 
+LV = W; % lim s->0 W*FF(s)
 
-mappatura_specifiche_bode(G, 'G', 5e4, 65, 0.5, 30, omega_cMin, Mf);
-mappatura_specifiche_bode(Ge1, 'Ge1', 5e4, 65, 0.5, 30, omega_cMin, Mf);
-mappatura_specifiche_bode(Ge2, 'Ge2', 5e4, 65, 0.5, 30, omega_cMin, Mf);
-mappatura_specifiche_bode(Ge3, 'Ge3', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+% vincolo sovraelongazione
+patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
+
+% vincolo tempo di assestamento all'5%
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
+
+ylim([0,LV*2]);
+
+Legend_step = ["Risposta al gradino"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+legend(Legend_step);
+
+%% Check disturbo in uscita
+
+% Funzione di sensitività
+SS = 1/(1+LL);
+figure();
+
+% Simulazione disturbo in uscita a pulsazione 0.05
+tt = 0:1e-2:2e2;
+dd = DD(tt);
+y_d = lsim(SS,dd,tt);
+hold on, grid on, zoom on
+plot(tt,dd,'m')
+plot(tt,y_d,'b')
+grid on
+legend('d(t)','y_d(t)')
+
+%% Check disturbo di misura
+figure();
+
+% Simulazione disturbo di misura a pulsazione 1000
+tt = 0:1e-6:2e-3;
+nn = NN(tt);
+y_n = lsim(-FF,nn,tt);
+hold on, grid on, zoom on
+plot(tt,nn,'m')
+plot(tt,y_n,'b')
+grid on
+legend('n(t)','y_n(t')
 
 
 %animation(-1.5*pi:0.1:pi/2, 2);
@@ -127,5 +179,3 @@ function [omega_plot_min, omega_plot_max, omega_cMax] = mappatura_specifiche_bod
     grid on, hold on;
     title(titolo);
 end
-
-
