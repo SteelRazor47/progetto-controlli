@@ -3,44 +3,50 @@ set(0,'DefaultFigureWindowStyle','docked');
 
 W = 1;
 D = 1;
-e_max = 0.1;
-S = 0.15;
-T_a5 = 0.01;
+e_max = 0.04;
+S = 0.10;
+T_a5 = 0.008;
 
 
 beta = 1;
-J0 = 1.7e-4;
-Ji =    [1e-5     7e-5    9e-6    2e-6];
-phi =   [-0.04   2.9     2.8     -2.6];
-k = [1 2 3 4];
+J0 = 1.7;
+Ji =    [0.1     0.7    0.09    0.02];
+phi =   [-0.04   2.9    2.8     -2.6];
+k = 50;
 J = @(x) J0 + Ji(1) * cos(x + phi(1))+ Ji(2) * cos(2*x + phi(2))+ Ji(3) * cos(3*x + phi(3))+ Ji(4) * cos(4*x + phi(4));
 Jdot = @(x) -(Ji(1) * sin(x + phi(1))+ Ji(2) * 2 * sin(2*x + phi(2))+ Ji(3) * 3 * sin(3*x + phi(3))+ Ji(4) * 4 * sin(4*x + phi(4)));
 
-DD = @(x) sin(0.1*k(1)*x) + sin(0.1*k(2)*x) + sin(0.1*k(3)*x) + sin(0.1*k(4)*x);
-NN = @(x) sin((5e4)*k(1)*x) + sin((5e4)*k(2)*x) + sin((5e4)*k(3)*x) + sin((5e4)*k(4)*x);
+DD = noise_gen(0.1);
+NN = noise_gen(5e4);
+
 % x1 = theta, x2 = omega, u = Cm
-% xdot = [ x2; (u - beta * x2) / J(x1) ] = f(x, u)
+% xdot = [ x2; (u - beta * x2 - k * x1) / J(x1) ] = f(x, u)
 % y = x1 = h(x,u)
 
 omega_e = 0;
 theta_e = pi / 3;
-u_e = 0; % beta * x2 = beta * omega_e = 0
+u_e = beta * omega_e + k * theta_e; % xdot(2) = 0
 x_e = [theta_e; omega_e];
 x_sim = x_e;
 
 %In questo caso A_e = [0 1; 0 -1/J(theta_e)]
-A_e = [0 1; -(J(theta_e))^-2 * Jdot(theta_e) * (u_e - beta * omega_e)   -beta/J(theta_e)];
+A_e = [0 1; -k * (J(theta_e) - theta_e * Jdot(theta_e))/J(theta_e)^2   -beta/J(theta_e)];
 B_e = [0; 1/J(theta_e)];
 C = [1 0];
 D = 0;
+
+%%
 
 s = tf('s');
 
 modello = ss(A_e, B_e, C, D);
 G = tf(modello);
+Gdisp = zpk(G);
+Gdisp.DisplayFormat = 'Frequency';
+display(Gdisp);
 
 xi = sqrt(log(S)^2/(pi^2+log(S)^2));
-Mf = xi*100;
+Mf = max(xi*100, 30);
 
 omega_cMin = 3 / (T_a5*xi);
 
@@ -111,7 +117,7 @@ plot(tt,y_n,'b')
 grid on
 legend('n(t)','y_n(t')
 
-%%
+%% Angolo iniziale
 figure();
 hold on, grid on, zoom on;
 
@@ -121,7 +127,7 @@ for theta = 0:2*pi/10:2*pi
     plot(out.y_sim);
 end
 
-%%
+%% Velocità iniziale
 figure();
 hold on, grid on, zoom on;
 
@@ -131,7 +137,13 @@ for vel = 0:1000:10000
     plot(out.y_sim);
 end
 
-%%
+%% Animazione
+
+%x_sim = x_e;
+%out = sim("SdC_progetto.slx");
+%animation(out.y_sim(1).Data, 15);
+
+%% Gradini
 figure();
 hold on, grid on, zoom on;
 
@@ -142,11 +154,17 @@ for w = 0:2*pi/10:2*pi
     plot(out.y_sim);
 end
 
-%animation(-1.5*pi:0.1:pi/2, 2);
-
-
-
 %% Funzioni
+function [out] = noise_gen(omega)
+    function [res] = sum(x)
+        res = 0;
+        for k = 1:4
+            res = res + sin(omega * k * x);
+        end
+    end
+    out = @sum;
+end
+
 function [] = animation(thetas, figure_n)
     wheel_center = [0 2];
     wheel_r = 0.6;
@@ -164,7 +182,7 @@ function [] = animation(thetas, figure_n)
         grid on;
         axis([-1 6 0 4]);
         axis equal;
-        theta = thetas(i);
+        theta = -thetas(i);
         pin1 = wheel_center + wheel_r * [cos(theta), sin(theta)];
         [cx, cy] = findPointOnCircle(pin1, bar_length, bar_c, vbar_length);
         hbar_left = [cx cy];
