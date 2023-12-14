@@ -6,7 +6,10 @@ D = 1;
 e_max = 0.04;
 S = 0.10;
 T_a5 = 0.008;
-
+A_d = 30;
+A_n = 65;
+omega_d_max = 0.5;
+omega_n_min = 5e4;
 
 beta = 1;
 J0 = 1.7;
@@ -50,20 +53,47 @@ Mf = max(xi*100, 30);
 
 omega_cMin = 3 / (T_a5*xi);
 
-mappatura_specifiche_bode(G, 'G', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+mappatura_specifiche_bode(G, 'G', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
 
-phi = deg2rad(-5);
-M_star = 0.31; %circa -10dB
-omega_star = 5e4;
-tau = (cos(phi) - 1/M_star)/(omega_star * sin(phi));
-alpha = (M_star - cos(phi))/(omega_star * sin(phi)) / tau;
+%% Regolatore statico - proporzionale senza poli nell'origine
 
-ritardo = (1+tau * alpha * s)/(1+tau*s);
-mu = omega_cMin * 1.5;
-R = mu * ritardo;
-LL =  R * G;
+% valore minimo prescritto per L(0)
+mu_s_error = (D+W)/e_max;
+mu_s_dist  = 10^(A_d/20);
 
-mappatura_specifiche_bode(LL, 'L', 5e4, 65, 0.5, 30, omega_cMin, Mf);
+% guadagno minimo del regolatore ottenuto come L(0)/G(0)
+G_0 = abs(evalfr(G,0));
+G_omega_d_max = abs(evalfr(G,1i*omega_d_max));
+
+R_s = max(mu_s_error/G_0,mu_s_dist/G_omega_d_max);
+
+% Sistema esteso
+G_e = R_s*G;
+
+mappatura_specifiche_bode(G_e, 'G_e', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
+
+%% Regolatore dinamico
+
+Mf_star = Mf+5;
+omega_c_star = 750;
+
+mag_omega_c_star_dB = abs(evalfr(G_e,j*omega_c_star));
+arg_omega_c_star    = rad2deg(angle(evalfr(G_e,j*omega_c_star)));
+
+M_star = 1/mag_omega_c_star_dB;
+phi_star = Mf_star - 180 - arg_omega_c_star;
+
+tau = (M_star - cos(phi_star*pi/180))/(omega_c_star*sin(phi_star*pi/180));
+alpha_tau = (cos(phi_star*pi/180) - 1/M_star)/(omega_c_star*sin(phi_star*pi/180));
+alpha = alpha_tau / tau;
+
+anticipo = (1+tau * s)/(1+alpha*tau*s);
+R = anticipo;
+LL =  R * G_e;
+
+mappatura_specifiche_bode(LL, 'L', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
+
+%% Check prestazioni in anello chiuso
 
 FF = LL / (1+LL);
 
@@ -74,7 +104,7 @@ T_simulation = 2*T_a5;
 plot(t_step,y_step,'b');
 grid on, zoom on, hold on;
 
-LV = W; % lim s->0 W*FF(s)
+LV = evalfr(W*FF,0); % lim s->0 W*FF(s)
 
 % vincolo sovraelongazione
 patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
