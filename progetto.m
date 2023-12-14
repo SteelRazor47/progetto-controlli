@@ -81,10 +81,10 @@ mag_omega_c_star_dB = abs(evalfr(G_e,j*omega_c_star));
 arg_omega_c_star    = rad2deg(angle(evalfr(G_e,j*omega_c_star)));
 
 M_star = 1/mag_omega_c_star_dB;
-phi_star = Mf_star - 180 - arg_omega_c_star;
+phi_star = deg2rad(Mf_star - 180 - arg_omega_c_star);
 
-tau = (M_star - cos(phi_star*pi/180))/(omega_c_star*sin(phi_star*pi/180));
-alpha_tau = (cos(phi_star*pi/180) - 1/M_star)/(omega_c_star*sin(phi_star*pi/180));
+tau = (M_star - cos(phi_star))/(omega_c_star*sin(phi_star));
+alpha_tau = (cos(phi_star) - 1/M_star)/(omega_c_star*sin(phi_star));
 alpha = alpha_tau / tau;
 
 anticipo = (1+tau * s)/(1+alpha*tau*s);
