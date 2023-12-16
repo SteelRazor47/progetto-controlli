@@ -88,8 +88,8 @@ alpha_tau = (cos(phi_star) - 1/M_star)/(omega_c_star*sin(phi_star));
 alpha = alpha_tau / tau;
 
 anticipo = (1+tau * s)/(1+alpha*tau*s);
-R = anticipo;
-LL =  R * G_e;
+R = R_s * anticipo;
+LL =  R * G;
 
 mappatura_specifiche_bode(LL, 'L', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
 
