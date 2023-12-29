@@ -32,8 +32,8 @@ u_e = beta * omega_e + k * theta_e; % xdot(2) = 0
 x_e = [theta_e; omega_e];
 x_sim = x_e;
 
-%In questo caso A_e = [0 1; 0 -1/J(theta_e)]
-A_e = [0 1; -k * (J(theta_e) - theta_e * Jdot(theta_e))/J(theta_e)^2   -beta/J(theta_e)];
+df2dx1 = (( k*theta_e+beta*omega_e-u_e )*Jdot(theta_e) - k*J(theta_e))/J(theta_e)^2;
+A_e = [0 1; df2dx1    -beta/J(theta_e)];
 B_e = [0; 1/J(theta_e)];
 C = [1 0];
 D = 0;
