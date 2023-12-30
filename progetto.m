@@ -1,6 +1,7 @@
 clc; close all; clear all;
 set(0,'DefaultFigureWindowStyle','docked');
 
+%% Inizializzazione dei parametri 
 W = 1;
 D = 1;
 e_max = 0.04;
@@ -22,23 +23,22 @@ Jdot = @(x) -(Ji(1) * sin(x + phi(1))+ Ji(2) * 2 * sin(2*x + phi(2))+ Ji(3) * 3 
 DD = noise_gen(0.1);
 NN = noise_gen(5e4);
 
-% x1 = theta, x2 = omega, u = Cm
-% xdot = [ x2; (u - beta * x2 - k * x1) / J(x1) ] = f(x, u)
-% y = x1 = h(x,u)
 
+%% Valori all'equilibrio
 omega_e = 0;
 theta_e = pi / 3;
-u_e = beta * omega_e + k * theta_e; % xdot(2) = 0
+u_e = beta * omega_e + k * theta_e;
 x_e = [theta_e; omega_e];
 x_sim = x_e;
 
+%% Linearizzazione
 df2dx1 = (( k*theta_e+beta*omega_e-u_e )*Jdot(theta_e) - k*J(theta_e))/J(theta_e)^2;
 A_e = [0 1; df2dx1    -beta/J(theta_e)];
 B_e = [0; 1/J(theta_e)];
 C = [1 0];
 D = 0;
 
-%%
+%% Creazione del modello
 
 s = tf('s');
 
@@ -109,7 +109,7 @@ LV = evalfr(W*FF,0); % lim s->0 W*FF(s)
 % vincolo sovraelongazione
 patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
 
-% vincolo tempo di assestamento all'5%
+% vincolo tempo di assestamento al 5%
 patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
 patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
 
@@ -156,6 +156,8 @@ for theta = 0:2*pi/10:2*pi
     out = sim("SdC_progetto.slx");
     plot(out.y_sim);
 end
+legend('\theta = 0', '\theta = {2\pi}/{10}','\theta = {4\pi}/{10}','\theta = {6\pi}/{10}','\theta = {8\pi}/{10}', '\theta = \pi', ...
+    '\theta = {12\pi}/{10}','\theta = {14\pi}/{10}','\theta = {16\pi}/{10}','\theta = {18\pi}/{10}','\theta = 2\pi')
 
 %% Velocità iniziale
 figure();
@@ -166,6 +168,8 @@ for vel = 0:1000:10000
     out = sim("SdC_progetto.slx");
     plot(out.y_sim);
 end
+legend('\omega = 0', '\omega = 1000','\omega = 2000','\omega = 3000','\omega = 4000', '\omega = 5000', ...
+    '\omega = 6000','\omega = 7000','\omega = 8000','\omega = 9000','\omega = 10000')
 
 %% Animazione
 
@@ -183,6 +187,8 @@ for w = 0:2*pi/10:2*pi
     out = sim("SdC_progetto.slx");
     plot(out.y_sim);
 end
+legend('w = 0', 'w = {2\pi}/{10}','w = {4\pi}/{10}','w = {6\pi}/{10}','w = {8\pi}/{10}', 'w = \pi', ...
+    'w = {12\pi}/{10}','w = {14\pi}/{10}','w = {16\pi}/{10}','w = {18\pi}/{10}','w = 2\pi')
 
 %% Funzioni
 function [out] = noise_gen(omega)
