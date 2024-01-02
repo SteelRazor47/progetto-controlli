@@ -223,25 +223,31 @@ In Figura \dots, mostriamo il diagramma di Bode della funzione d'anello $L(s) = 
 
 \section{Test sul sistema linearizzato}
 
-In questa sezione, testiamo l'efficacia del controllore progettato sul sistema linearizzato con $w(t) = 1(t)$, $d(t)=\sum_{k = 1}^{4} \sin(5\space\cdot\space 10^{4}kt)  $.
+In questa sezione, testiamo l'efficacia del controllore progettato sul sistema linearizzato con $w(t) = 1(t)$, $d(t)=\sum_{k = 1}^{4} \sin(0.1kt)$ e $n(t)=\sum_{k = 1}^{4} \sin(5\space\cdot\space 10^{4}kt) $.
 
 In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzato ad un gradino unitario. \`E possibile notare come essa rispetti le specifiche richieste riguardanti tempo di assestamento, sovraelongazione e massimo errore a regime.
  
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.8\linewidth]{C:/Users/loren/Desktop/CAT-Immagini/stepRespLin.png}
+	\includegraphics[width=0.9\linewidth]{./images/stepRespLin.png}
 	\caption{Risposta del sistema linearizzato ad un gradino unitario.}
 	\label{fig:step_response}
 \end{figure}
 
-Questo risultato \`e stato ottenuto progettando un regolatore statico $R_s(s)$ adeguato al fine di mantenere l'errore a regime inferiore a $0.004$ (come spiegato nella Sezione~\ref{sec:static_regulator}) 
-e un regolatore dinamico $R_d(s)$ che facesse s\`i che il sistema rispettasse un vincolo sul margine di fase $M_f$ tale per cui si evitino sovraelongazione e tempo di assestamento superiori alle specifiche richieste
+Questo risultato \`e stato ottenuto progettando un regolatore statico $R_s(s)$ adeguato al fine di mantenere l'errore a regime inferiore ad un valore di $0.004$ (come spiegato nella Sezione~\ref{sec:static_regulator}) 
+e un regolatore dinamico $R_d(s)$ che facesse s\`i che il sistema rispettasse un vincolo sul margine di fase $M_f$ tale per cui non si verificassero sovraelongazione e tempo di assestamento superiori alle specifiche richieste
 (come spiegato nella Sezione~\ref{sec:dynamic_regulator}).
 
 \section{Test sul sistema non lineare}
 
-In questa sezione, testiamo l'efficacia del controllore progettato sul modello non lineare con \dots
+In questa sezione, testiamo l'efficacia del controllore progettato sul modello non lineare, tenendo anche conto della presenza di $d(t)$ ed $n(t)$.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.9\linewidth]{./images/stepRespNonLinUni.png}
+	\caption{Risposta del sistema non lineare ad un gradino unitario.}
+	\label{fig:step_response_non_lin_uni}
+\end{figure}
 
 \section{Punti opzionali}
 
