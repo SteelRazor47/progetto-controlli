@@ -2,3 +2,10 @@
 *.slxc
 *.asv
 slprj
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.out
+*.log
+*.slx.*

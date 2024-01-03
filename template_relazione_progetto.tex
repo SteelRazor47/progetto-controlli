@@ -60,7 +60,7 @@
 		\Large  \strut Gruppo \group\strut
 		\vspace{-0.4cm}
 }
-\author{Autore, \dots}
+\author{Lorenzo Venturoli, Leonardo Benini, Gianluca Sabatini}
 \date{}
 
 \begin{document}
@@ -68,11 +68,14 @@
 \maketitle
 \vspace{-0.5cm}
 
-Il progetto riguarda il controllo di \dots, la cui dinamica viene descritta dalle seguenti equazioni differenziali 
+Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figura 1, la cui dinamica viene descritta dalle seguenti equazioni differenziali  
 %
 \begin{subequations}\label{eq:system}
 \begin{align}
-	\dots,
+	J(\theta) = \dot{\omega} = C_m - \beta\omega - k\theta 
+\end{align}
+\begin{align}
+	J(\theta) = J_0 + \sum_{n = 0}^{4}J_i\cos (i\theta +\psi_i)
 \end{align}
 \end{subequations}
 %
