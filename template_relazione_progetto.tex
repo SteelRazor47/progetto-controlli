@@ -44,10 +44,10 @@
 
 \newcommand{\courseacronym}{CAT}
 \newcommand{\coursename}{Controlli Automatici - T}
-\newcommand{\tipology}{\dots}
-\newcommand{\trace}{\dots}
-\newcommand{\projectname}{Nome del Progetto}
-\newcommand{\group}{\dots}
+\newcommand{\tipology}{b }
+\newcommand{\trace}{1}
+\newcommand{\projectname}{Controllo di meccanismo non-lineare attuato}
+\newcommand{\group}{K}
 
 %opening
 \title{ \vspace{-1in}
@@ -68,7 +68,7 @@
 \maketitle
 \vspace{-0.5cm}
 
-Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figura 1, la cui dinamica viene descritta dalle seguenti equazioni differenziali  
+Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figura \ref{fig:system_image}, la cui dinamica viene descritta dalle seguenti equazioni differenziali  
 %
 \begin{subequations}\label{eq:system}
 \begin{align}
@@ -79,9 +79,20 @@ Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figu
 \end{align}
 \end{subequations}
 %
-dove \dots rappresenta \dots.
-
-
+dove $\omega$(t) rappresenta la velocità angolare e in cui:
+\begin{itemize}
+	\item il momento d'interzia ridotto al movente $J(\theta)$ è una funzione periodica di periodo 2$\pi$;
+	\item $C_m$ è la coppia generata dal motore elettrico;
+	\item $\beta$ è l'attrito viscoso;
+	\item k è il coefficiente di elasticità del disco;
+  \end{itemize}
+%
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/system_image.png}
+	\caption{Schema illustrativo del sistema meccanismo motorizzato.}
+	\label{fig:system_image}
+\end{figure}
 \section{Espressione del sistema in forma di stato e calcolo del sistema linearizzato intorno ad una coppia di equilibrio}
 
 Innanzitutto, esprimiamo il sistema~\eqref{eq:system} nella seguente forma di stato
@@ -97,16 +108,26 @@ Innanzitutto, esprimiamo il sistema~\eqref{eq:system} nella seguente forma di st
 Pertanto, andiamo individuare lo stato $x$, l'ingresso $u$ e l'uscita $y$ del sistema come segue 
 %
 \begin{align*}
-	x := \dots, \quad u := \dots, \quad y := \dots.
+	x := \left [ \theta, \omega \right ]^T, \quad u := C_m , \quad y := \theta.
 \end{align*}
 %
 Coerentemente con questa scelta, ricaviamo dal sistema~\eqref{eq:system} la seguente espressione per le funzioni $f$ ed $h$
 %
-\begin{align*}
-	f(x,u) &:= \dots
-	\\
-	h(x,u) &:= \dots.
-\end{align*}
+\begin{align}
+	f(x,u) &:= 
+	\begin{bmatrix}
+		f_1(x,u)
+		\\[0.5em] 
+		f_2(x,u)
+	\end{bmatrix} :=
+	\begin{bmatrix}
+		x_2
+		\\[0.5em] 
+		\dfrac{u - \beta x_2 - kx_1}{J(x_1)}
+	\end{bmatrix}
+	\\[0.5em] 
+	h(x,u) &:= x_1
+\end{align}
 %
 Una volta calcolate $f$ ed $h$ esprimiamo~\eqref{eq:system} nella seguente forma di stato
 %
@@ -115,33 +136,42 @@ Una volta calcolate $f$ ed $h$ esprimiamo~\eqref{eq:system} nella seguente forma
 	\begin{bmatrix}
 		\dot{x}_1
 		\\
-		\dots
-	\end{bmatrix} &= \dots \label{eq:state_form_1}
-	\\
-	y &= \dots.
+		\dot{x}_2
+	\end{bmatrix} &= 
+	\begin{bmatrix}
+		f_1(x,u)
+		\\[0.5em] 
+		f_2(x,u)
+	\end{bmatrix}\label{eq:state_form_1}
+	\\[0.5em]
+	y &= h(x, u)
 \end{align}
 \end{subequations}
 %
-Per trovare la coppia di equilibrio $(x_e, u_e)$ di~\eqref{eq:our_system_state_form}, andiamo a risolvere il seguente sistema di equazioni
+Per trovare la coppia di equilibrio $(x_e, u_e)$ di~\eqref{eq:our_system_state_form}, andiamo a risolvere il seguente sistema di equazioni a partire dal valore fornito di $\theta_e=\frac{\pi}{3}$
 %
 \begin{align}
-	\dots,
+	\left\{\begin{matrix}
+		f(x_e, u_e)=0  
+		\\[0.5em]
+		x_{e1} = \frac{\pi}{3}
+	\end{matrix}\right.
 \end{align}
 %
 dal quale otteniamo
 %
 \begin{align}
-	x_e := \dots,  \quad u_e = \dots.\label{eq:equilibirum_pair}
+	x_e := \left[\frac{\pi}{3}, 0\right]^T,  \quad u_e = k\frac{\pi}{3}\label{eq:equilibirum_pair}
 \end{align}
 %
 Definiamo le variabili alle variazioni $\delta x$, $\delta u$ e $\delta y$ come 
 %
 \begin{align*}
-	\delta x &= \dots, 
+	\delta x &= x-x_e, 
 	\quad
-	\delta u = \dots, 
+	\delta u = u-u_e, 
 	\quad
-	\delta y = \dots.
+	\delta y = y-y_e.
 \end{align*}
 %
 L'evoluzione del sistema espressa nelle variabili alle variazioni pu\`o essere approssimativamente descritta mediante il seguente sistema lineare
@@ -158,13 +188,25 @@ dove le matrici $A$, $B$, $C$ e $D$ vengono calcolate come
 %
 \begin{subequations}\label{eq:matrices}
 \begin{align}
-	A &= \dots
+	A &= \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+		x = x_e
+		\\
+		u = u_e \end{smallmatrix}}
 	\\
-	B &= \dots
+	B &= \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+		x = x_e
+		\\
+		u = u_e \end{smallmatrix}}
 	\\
-	C &= \dots
+	C &= \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+		x = x_e
+		\\
+		u = u_e \end{smallmatrix}}
 	\\
-	D &= \dots.
+	D &= \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+		x = x_e
+		\\
+		u = u_e \end{smallmatrix}}
 \end{align}
 \end{subequations}
 %
@@ -174,55 +216,117 @@ In questa sezione, andiamo a calcolare la funzione di trasferimento $G(s)$ dall'
 %
 %
 \begin{align}\label{eq:transfer_function}
-G(s) = \dots = \dots.
+G(s) = C(sI-A)^{-1}B + D = \frac{0.02}{1+0.09919\frac{s}{4.96}+\frac{s^2}{4.96^2}}
 \end{align}
 %
-Dunque il sistema linearizzato~\eqref{eq:linearized_system} è caratterizzato dalla funzione di trasferimento~\eqref{eq:transfer_function} con $\dots$ poli $p_1 = \cdots, \cdots$ e $\dots$ zeri $z_i =\cdots$. In Figura \dots mostriamo il corrispondente diagramma di Bode. 
+Dunque il sistema linearizzato~\eqref{eq:linearized_system} è caratterizzato dalla funzione di trasferimento~\eqref{eq:transfer_function} con 2 poli complessi coniugati $p_1$ e $p_2$:
+\begin{align}
+	p_1 = -0.2460 + 4.9536i, \quad p_2 = -0.2460 - 4.9536i
+\end{align}
+In Figura \ref{fig:G_bode} mostriamo il corrispondente diagramma di Bode. 
 
-\dots
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/bode_G.png}
+	\caption{Diagrammi di Bode della funzione di trasferimento G.}
+	\label{fig:G_bode}
+\end{figure}
 
 \section{Mappatura specifiche del regolatore}
 \label{sec:specifications}
 
 Le specifiche da soddisfare sono
 \begin{itemize}
-	\item[1)] \dots\\
-	\item[2)] \dots\\
-	....\\
-	\item[6)] \dots.
+	\item[1)] Errore a regime $|e_{\infty}| \leq e^{\star}$ in risposta a un gradino $\omega (t) = 1(t)$ e $d(t)=1(t)$
+	\item[2)] Per garantire una certa robustezza del sistema si deve avere un margine di fase $M_f \geq 30^{\degree}$.
+	\item[3)] Il sistema può accettare una sovraelongazione percentuale al massimo del 10\% : S\% $\leq 10\%$. 
+	\item[4)] Il tempo di assestamento alla $\epsilon_{\%}$ = 5\% deve essere inferiore al valore fissato: $T_{a, \epsilon} = 0.008s$ .
+	\item[5)] Il disturbo sull'uscita d(t), con una banda limitata nel range di pulsazioni $[0, 0.5]$, deve essere abbattuto di almeno 30 dB.
+	\item[6)] Il rumore sull'uscita n(t), con una banda limitata nel range di pulsazioni $[5 \cdot 10^4, 5 \cdot 10^6]$, deve essere abbattuto di almeno 65 dB. 
 \end{itemize}
 %
-Andiamo ad effettuare la mappatura punto per punto le specifiche richieste. \dots  
+Andiamo ad effettuare la mappatura punto per punto le specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore \dots  
 
-Pertanto, in Figura \dots, mostriamo il diagramma di Bode della funzione di trasferimento $G(s)$ con le zone proibite emerse dalla mappatura delle specifiche.
-
-\dots
+Pertanto, in Figura \ref{fig:G_bode_specifiche}, mostriamo il diagramma di Bode della funzione di trasferimento $G(s)$ con le zone proibite emerse dalla mappatura delle specifiche.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/bode_G_mappatura.png}
+	\caption{Mapputura delle specifiche.}
+	\label{fig:G_bode_specifiche}
+\end{figure}
 
 \section{Sintesi del regolatore statico}
 \label{sec:static_regulator}
 
 In questa sezione progettiamo il regolatore statico $R_s(s)$ partendo dalle analisi fatte in sezione~\ref{sec:specifications}.
 
-\dots
+Nel nostro caso, essendo l'errore a regime $>$ 0 , possiamo progettare il regolatore statico come:
+\begin{align}
+	R(s) = \mu_s.
+\end{align}
 
-Dunque, definiamo la funzione estesa $G_e(s) = R_s(s)G(s)$ e, in Figura \dots, mostriamo il suo diagramma di Bode per verificare se e quali zone proibite vengono attraversate.
+Consideriamo quindi che:
+\begin{align}
+	\mu_s \geq \mu^{\star} = \frac{D+W}{e^{\star}}.
+\end{align}
+Con D e W rispettive ampiezza dei gradini di disturbo sull'uscita e ingresso.\\
+Per determinare $\mu_s$ bisogna anche considerare la specifica sull'attenuazione di d(t):
+\begin{align}
+	\mu_s \geq \mu_{sd} = 10^{\frac{A_d}{20}}.
+\end{align}
+Con $A_d$ pari a 30 dB. Otteniamo quindi $\mu_s$ come:
+\begin{align}
+	\mu_s \geq max\bigg(\frac{\mu^{\star}}{\left| L(0)\right|}, \frac{\mu_{sd}}{\left| G(j\omega_{d_{max}})\right|}\bigg).
+\end{align}
 
-\dots
+Dunque, definiamo la funzione estesa $G_e(s) = R_s(s)G(s)$ e, in Figura \ref{fig:G_e}, mostriamo il suo diagramma di Bode per verificare se e quali zone proibite vengono attraversate.
+Dalla figura emerge come il regolatore ora rispetti la specifica sull'attenuazione del disturbo in uscita.
 
-Da Figura \dots, emerge \dots
-
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/G_e.png}
+	\caption{Mappatura specifiche su $G_e$.}
+	\label{fig:G_e}
+\end{figure}
 
 \section{Sintesi del regolatore dinamico}
 \label{sec:dynamic_regulator}
 
 In questa sezione, progettiamo il regolatore dinamico $R_d(s)$. 
 %
-Dalle analisi fatte in Sezione~\ref{sec:static_regulator}, notiamo di essere nello Scenario di tipo \dots. Dunque, progettiamo $R_d(s)$ ricorrendo a \dots
+Dalle analisi fatte in Sezione~\ref{sec:static_regulator}, notiamo di essere nello Scenario di tipo B. Dunque, progettiamo $R_d(s)$ ricorrendo a una rete anticipatrice.\\
+A questo scopo, calcoliamo il margine di fase per rispettare le specifiche:
+\begin{align}
+	\xi^{\star} = \sqrt[2]{\frac{\log{S}^2}{\pi^2 + \log{S}^2}}.
+	\\[0.5em]
+	Mf = max (\xi^{\star}, 30).
+\end{align}
+Dove S=0.1. Otteniamo quindi:
+\begin{align}
+	\omega_{c_{min}}=\frac{300}{T_{a, 5}*Mf}.
+\end{align}
+La rete anticipatrice si presenta nella forma:
+\begin{align}
+	R_d(s) = \frac{1+\tau s}{1+\alpha \tau s}.
+\end{align}
+Nel nostro caso, sfruttando le formule di inversione:
+\begin{align}
+	\tau = \frac{M^{\star}-\cos{\varphi^{\star}}}{\omega_c^{\star}\sin{\varphi^{\star}}}, \quad
+	\alpha = \frac{\cos{\varphi^{\star}-\frac{1}{M^{\star}}}}{\omega_c^{\star}\sin{\varphi^{\star}}}\frac{1}{\tau}.
+	\\[1em]
+	M^{\star} = 10^{-\frac{\left|G_e(j\omega_c^{\star})\right|_{dB}}{20}}, \quad
+	\varphi^{\star} = M_f^{\star} -\pi - \angle{G_e(j\omega_c^{\star})},
+\end{align}
+con $\omega_c^{\star}$ pari a 750 $\frac{rad}{s}$ e $M_f^{\star}$ pari a $M_f + 5$, da noi fissati rispettando le specifiche.\\
 
+In Figura \ref{fig:funzione_anello}, mostriamo il diagramma di Bode della funzione d'anello $L(s) = R_d(s) G_e(s)$
 
-In Figura \dots, mostriamo il diagramma di Bode della funzione d'anello $L(s) = R_d(s) G_e(s)$
-
-\dots
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/funzione_anello.png}
+	\caption{Funzione d'anello L(s).}
+	\label{fig:funzione_anello}
+\end{figure}
 
 \section{Test sul sistema linearizzato}
 
