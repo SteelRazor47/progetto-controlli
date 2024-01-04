@@ -332,7 +332,11 @@ In Figura \ref{fig:funzione_anello}, mostriamo il diagramma di Bode della funzio
 
 In questa sezione, testiamo l'efficacia del controllore progettato sul sistema linearizzato con $w(t) = 1(t)$, $d(t)=\sum_{k = 1}^{4} \sin(0.1kt)$ e $n(t)=\sum_{k = 1}^{4} \sin(5\space\cdot\space 10^{4}kt) $.
 
-In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzato ad un gradino unitario. \`E possibile notare come essa rispetti le specifiche richieste riguardanti tempo di assestamento, sovraelongazione e massimo errore a regime.
+In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzato ad un gradino unitario. \`E possibile notare come essa rispetti le specifiche richieste riguardanti tempo di assestamento, sovraelongazione e massimo errore a regime. 
+
+Il grafico della risposta al gradino unitario non interseca né la patch rossa, che corrisponde a valori per cui non sarebbe rispettato il vincolo sulla sovraelongazione,
+né la patch verde, la quale corrisponde a valori per cui il vincolo sul tempo di assestamento risulterebbe non rispettato. 
+Inoltre, la risposta al gradino unitario a regime si stabilizza a $0.9690$, valore che ricade entro l'intervallo di errore di $\pm0.04$ richiesto dalle specifiche.
  
 \begin{figure}[h!]
 	\centering
@@ -341,13 +345,31 @@ In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzat
 	\label{fig:step_response}
 \end{figure}
 
-Questo risultato \`e stato ottenuto progettando un regolatore statico $R_s(s)$ adeguato al fine di mantenere l'errore a regime inferiore ad un valore di $0.004$ (come spiegato nella Sezione~\ref{sec:static_regulator}) 
+Questo risultato \`e stato ottenuto progettando un regolatore statico $R_s(s)$ adeguato al fine di mantenere l'errore a regime inferiore ad un valore di $0.04$ (come spiegato nella Sezione~\ref{sec:static_regulator}) 
 e un regolatore dinamico $R_d(s)$ che facesse s\`i che il sistema rispettasse un vincolo sul margine di fase $M_f$ tale per cui non si verificassero sovraelongazione e tempo di assestamento superiori alle specifiche richieste
 (come spiegato nella Sezione~\ref{sec:dynamic_regulator}).
 
 \section{Test sul sistema non lineare}
 
-In questa sezione, testiamo l'efficacia del controllore progettato sul modello non lineare, tenendo anche conto della presenza di $d(t)$ ed $n(t)$.
+In questa sezione, testiamo l'efficacia del controllore progettato sul modello non lineare, tenendo anche conto della presenza di $d(t)$ ed $n(t)$. 
+Il test \`e stato effettuato utilizzando un modello Simulink, come mostrato nella figura \ref*{fig:simulink}.
+
+Pi\`u nello specifico,
+da sinistra a destra si trovano un blocco generatore di segnali a gradino al quale viene sottratto il valore dell'uscita precedente (in modo da realizzare il controllo in retroazione), ed in seguito anche il disturbo di misura $n(t)$. 
+Tutto ci\`o viene portato in ingresso ad un blocco Simulink contenente le specifiche del regolatoe da noi definito, il cui output viene sommato al valore dell'ingresso all'equilibrio ($u_e$) e mandato in input ad un blocco contenente
+le equazioni di stato del modello non lineare. L'uscita di quest'ultimo viene fatta passare per un blocco integratore in modo da ricavare in valore dello stato (il blocco precedente ha come valore di output $\dot{x}$). Il valore cos\`i ottenuto 
+viene moltiplicato per il guadagno (matrice $C\cdot u$) e a quest'ultimo viene sommato il disturbo d'uscita $d(t)$, ottenendo cos\`i l'uscita del sistema non lineare, la quale viene portata in ingresso ad un blocco visualizzatore e fatta entrare nella retroazione,
+dove viene sommata con il valore al quale lo stato \`e all'equilibrio.
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{./images/simulink1.png}
+	\caption{Modello Simulink.}
+	\label{fig:simulink}
+\end{figure}
+
+Nella figura \ref*{fig:step_response_non_lin_uni} \dots
 
 \begin{figure}[h!]
 	\centering
