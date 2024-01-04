@@ -35,14 +35,14 @@ x_e = [theta_e; omega_e];
 df2dx1 = (( k*theta_e+beta*omega_e-u_e )*Jdot(theta_e) - k*J(theta_e))/J(theta_e)^2;
 A_e = [0 1; df2dx1    -beta/J(theta_e)];
 B_e = [0; 1/J(theta_e)];
-C = [1 0];
-D = 0;
+C_e = [1 0];
+D_e = 0;
 
 %% Creazione del modello
 
 s = tf('s');
 
-modello = ss(A_e, B_e, C, D);
+modello = ss(A_e, B_e, C_e, D_e);
 G = tf(modello);
 Gdisp = zpk(G);
 Gdisp.DisplayFormat = 'Frequency';
@@ -51,7 +51,7 @@ display(Gdisp);
 xi = sqrt(log(S)^2/(pi^2+log(S)^2));
 Mf = max(xi*100, 30);
 
-omega_cMin = 3 / (T_a5*xi);
+omega_cMin = 300 / (T_a5*Mf);
 
 mappatura_specifiche_bode(G, 'G', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
 
@@ -73,22 +73,23 @@ G_e = R_s*G;
 mappatura_specifiche_bode(G_e, 'G_e', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
 
 %% Regolatore dinamico
+% Ci troviamo nel caso B quindi progettiamo ua rete anticipatrice
 
 Mf_star = Mf+5;
 omega_c_star = 750;
 
-mag_omega_c_star_dB = abs(evalfr(G_e,j*omega_c_star));
+mag_omega_c_star    = abs(evalfr(G_e,j*omega_c_star));
 arg_omega_c_star    = rad2deg(angle(evalfr(G_e,j*omega_c_star)));
 
-M_star = 1/mag_omega_c_star_dB;
+M_star = 1/mag_omega_c_star;
 phi_star = deg2rad(Mf_star - 180 - arg_omega_c_star);
 
 tau = (M_star - cos(phi_star))/(omega_c_star*sin(phi_star));
 alpha_tau = (cos(phi_star) - 1/M_star)/(omega_c_star*sin(phi_star));
 alpha = alpha_tau / tau;
 
-anticipo = (1+tau * s)/(1+alpha*tau*s);
-R = R_s * anticipo;
+R_d = (1+tau * s)/(1+alpha*tau*s);
+R = R_s * R_d;
 LL =  R * G;
 
 mappatura_specifiche_bode(LL, 'L', omega_n_min, A_n, omega_d_max, A_d, omega_cMin, Mf);
@@ -98,11 +99,10 @@ mappatura_specifiche_bode(LL, 'L', omega_n_min, A_n, omega_d_max, A_d, omega_cMi
 FF = LL / (1+LL);
 
 figure();
-hold on;
+grid on, zoom on, hold on;
 T_simulation = 2*T_a5;
 [y_step,t_step] = step(W*FF, T_simulation);
 plot(t_step,y_step,'b');
-grid on, zoom on, hold on;
 
 LV = evalfr(W*FF,0); % lim s->0 W*FF(s)
 
@@ -115,37 +115,73 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 
 ylim([0,LV*2]);
 
-Legend_step = ["Risposta al gradino"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+Legend_step = ["Risposta al gradino (lineare)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
 
+%% Check prestazioni non linearizzato
+x_sim = x_e;
+W_sim = W;
+out = sim("SdC_progetto.slx","StopTime","0.01");
+figure();
+hold on; zoom on; grid on;
+data = out.y_sim.Data - theta_e;
+plot(out.y_sim.Time, data);
+
+LV = data(end);
+T_simulation = 0.01;
+
+% vincolo sovraelongazione
+patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
+
+% vincolo tempo di assestamento al 5%
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
+
+ylim([0,LV*2]);
+
+Legend_step = ["Risposta al gradino (non lineare)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+legend(Legend_step);
+
+%% Confronto
+T_simulation = 2*T_a5;
+outl = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
+x_sim = x_e;
+out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data - theta_e;
+
+figure();
+hold on; zoom on; grid on;
+plot(outl.y_sim,'b');
+plot(out.y_sim.Time, data, 'r');
+
+Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lineare)"];
+legend(Legend_step);
 %% Check disturbo in uscita
 
 % Funzione di sensitività
 SS = 1/(1+LL);
 figure();
 
-% Simulazione disturbo in uscita a pulsazione 0.05
+% Simulazione disturbo in uscita a pulsazione 0.1-0.4
 tt = 0:1e-2:2e2;
 dd = DD(tt);
 y_d = lsim(SS,dd,tt);
 hold on, grid on, zoom on
 plot(tt,dd,'m')
 plot(tt,y_d,'b')
-grid on
 legend('d(t)','y_d(t)')
 
 %% Check disturbo di misura
 figure();
 
-% Simulazione disturbo di misura a pulsazione 1000
+% Simulazione disturbo di misura a pulsazione 50k-200k
 tt = 0:1e-6:2e-3;
 nn = NN(tt);
 y_n = lsim(-FF,nn,tt);
 hold on, grid on, zoom on
 plot(tt,nn,'m')
 plot(tt,y_n,'b')
-grid on
-legend('n(t)','y_n(t')
+legend('n(t)','y_n(t)')
 
 %% Punti opzionali
 
@@ -225,10 +261,11 @@ for i = 1:length(w_range)
     
     W_sim = W + w_range(i);
 
-    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
+    out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
     data = out.y_sim.Data - theta_e;
+
     p = plot(out.y_sim.Time, data);
-    LV = LVs{i};
+    LV = data(end);
     patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
 
     % vincolo tempo di assestamento al 5%

@@ -30,6 +30,7 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 
+\setlength{\parindent}{0pt}
 
 \usetikzlibrary{snakes}
 \usetikzlibrary{positioning}
@@ -179,36 +180,35 @@ L'evoluzione del sistema espressa nelle variabili alle variazioni pu\`o essere a
 %
 \begin{subequations}\label{eq:linearized_system}
 	\begin{align}
-		\delta \dot{x} & = A\delta x + B\delta u
+		\delta \dot{x} & = A_e\delta x + B_e\delta u
 		\\
-		\delta y       & = C\delta x + D\delta u,
+		\delta y       & = C_e\delta x + D_e\delta u,
 	\end{align}
 \end{subequations}
 %
-dove le matrici $A$, $B$, $C$ e $D$ vengono calcolate come
-%
-\begin{subequations}\label{eq:matrices}
-	\begin{align}
-		A & = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-			                                                  x = x_e
-			                                                  \\
-			                                                  u = u_e \end{smallmatrix}}
-		\\
-		B & = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-			                                                  x = x_e
-			                                                  \\
-			                                                  u = u_e \end{smallmatrix}}
-		\\
-		C & = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-			                                                  x = x_e
-			                                                  \\
-			                                                  u = u_e \end{smallmatrix}}
-		\\
-		D & = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-			                                                  x = x_e
-			                                                  \\
-			                                                  u = u_e \end{smallmatrix}}
-	\end{align}
+dove le matrici $A_e$, $B_e$, $C_e$ e $D_e$ vengono calcolate come
+\\[0.5em]
+
+\begin{subequations}\label{eq:matrices}\centering
+	$A_e = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+															x = x_e
+															\\
+															u = u_e \end{smallmatrix}}$
+	\quad
+	$B_e = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+															x = x_e
+															\\
+															u = u_e \end{smallmatrix}}$
+	\quad
+	$C_e = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+															x = x_e
+															\\
+															u = u_e \end{smallmatrix}}$
+	\quad
+	$D_e = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+															x = x_e
+															\\
+															u = u_e \end{smallmatrix}}$
 \end{subequations}
 %
 \section{Calcolo Funzione di Trasferimento}
@@ -246,7 +246,7 @@ Le specifiche da soddisfare sono
 	\item[6)] Il rumore sull'uscita n(t), con una banda limitata nel range di pulsazioni $[5 \cdot 10^4, 5 \cdot 10^6]$, deve essere abbattuto di almeno 65 dB.
 \end{itemize}
 %
-Andiamo ad effettuare la mappatura punto per punto le specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore \dots  
+Andiamo ad effettuare la mappatura punto per punto le specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore.  
 
 Pertanto, in Figura \ref{fig:G_bode_specifiche}, mostriamo il diagramma di Bode della funzione di trasferimento $G(s)$ con le zone proibite emerse dalla mappatura delle specifiche.
 \begin{figure}[h!]
@@ -298,7 +298,7 @@ In questa sezione, progettiamo il regolatore dinamico $R_d(s)$.
 Dalle analisi fatte in Sezione~\ref{sec:static_regulator}, notiamo di essere nello Scenario di tipo B. Dunque, progettiamo $R_d(s)$ ricorrendo a una rete anticipatrice.\\
 A questo scopo, calcoliamo il margine di fase per rispettare le specifiche:
 \begin{align}
-	\xi^{\star} = \sqrt[2]{\frac{\log{S}^2}{\pi^2 + \log{S}^2}}.
+	\xi^{\star} = \sqrt{\frac{\log{S}^2}{\pi^2 + \log{S}^2}}.
 	\\[0.5em]
 	Mf = max (\xi^{\star}, 30).
 \end{align}
@@ -318,7 +318,7 @@ Nel nostro caso, sfruttando le formule di inversione:
 	M^{\star} = 10^{-\frac{\left|G_e(j\omega_c^{\star})\right|_{dB}}{20}}, \quad
 	\varphi^{\star} = M_f^{\star} -\pi - \angle{G_e(j\omega_c^{\star})},
 \end{align}
-con $\omega_c^{\star}$ pari a 750 $\frac{rad}{s}$ e $M_f^{\star}$ pari a $M_f + 5$, da noi fissati rispettando le specifiche.\\
+con $\omega_c^{\star}$ pari a 750 $\frac{rad}{s}$ e $M_f^{\star}$ pari a $M_f + 5 \degree $, da noi fissati rispettando le specifiche.\\
 
 In Figura \ref{fig:funzione_anello}, mostriamo il diagramma di Bode della funzione d'anello $L(s) = R_d(s) G_e(s)$
 
@@ -337,7 +337,7 @@ In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzat
 
 Il grafico della risposta al gradino unitario non interseca né la patch rossa, che corrisponde a valori per cui non sarebbe rispettato il vincolo sulla sovraelongazione,
 né la patch verde, la quale corrisponde a valori per cui il vincolo sul tempo di assestamento risulterebbe non rispettato. 
-Inoltre, la risposta al gradino unitario a regime si stabilizza a $0.9690$, valore che ricade entro l'intervallo di errore di $\pm0.04$ richiesto dalle specifiche.
+Inoltre, la risposta al gradino unitario a regime si stabilizza a $0.9804$, valore che ricade entro l'intervallo di errore di $\pm0.04$ richiesto dalle specifiche.
 
 \begin{figure}[h!]
 	\centering
@@ -359,7 +359,7 @@ Pi\`u nello specifico,
 da sinistra a destra si trovano un blocco generatore di segnali a gradino al quale viene sottratto il valore dell'uscita precedente (in modo da realizzare il controllo in retroazione), ed in seguito anche il disturbo di misura $n(t)$. 
 Tutto ci\`o viene portato in ingresso ad un blocco Simulink contenente le specifiche del regolatore da noi definito, il cui output viene sommato al valore dell'ingresso all'equilibrio ($u_e$) e mandato in input ad un blocco contenente
 le equazioni di stato del modello non lineare. L'uscita di quest'ultimo viene fatta passare per un blocco integratore in modo da ricavare in valore dello stato (il blocco precedente ha come valore di output $\dot{x}$). Il valore cos\`i ottenuto 
-viene moltiplicato per il guadagno (matrice $C\cdot u$) e a quest'ultimo viene sommato il disturbo d'uscita $d(t)$, ottenendo cos\`i l'uscita del sistema non lineare, la quale viene portata in ingresso ad un blocco visualizzatore e fatta entrare nella retroazione,
+viene moltiplicato per il guadagno (matrice $C_e\cdot u$) e a quest'ultimo viene sommato il disturbo d'uscita $d(t)$, ottenendo cos\`i l'uscita del sistema non lineare, la quale viene portata in ingresso ad un blocco visualizzatore e fatta entrare nella retroazione,
 dove le viene sottratto il valore di $x_e$, ossia l'equilibrio per lo stato. Quest'ultimo passaggio è realizzato per far sì che $x(t)$ converga a $x_e$.
 
 
@@ -411,7 +411,7 @@ In particolare si noti come i due cardini(?) della trave(?) connessa alla ruota 
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{./images/omega_iniziali.png}
-		\caption{Andamento di $\delta y$ al variare della velocità angolare iniziale, $0.1 \le \lvert\theta\rvert \le 10^6$}
+		\caption{Andamento di $\delta y$ al variare della velocità angolare iniziale, $0.1 \le \lvert\omega\rvert \le 10^6$}
 		\label{fig:omega_iniziali}
 	\end{subfigure}
 	
@@ -421,7 +421,7 @@ In particolare si noti come i due cardini(?) della trave(?) connessa alla ruota 
 
 Il regolatore realizzato è stato testato con un riferimento $\theta(t)=\theta_e$ sul sistema non lineare al variare dello stato iniziale. Essendo il regolatore progettato sul sistema linearizzato attorno a $\theta_e=\pi/3$, il riferimento in ingresso è data da $w(t)=\delta y=0$. Per variare lo stato iniziale del sistema è sufficiente variare lo stato iniziale dell'integratore in uscita al sistema dinamico nel modello in figura \ref{fig:simulink}.
 
-Il sistema è considerato convergente al riferimento se soddisfa l'errore a regime di $e_{\inf} = 0.04$, analogamente alla progettazione del regolatore.
+Il sistema è considerato convergente al riferimento se soddisfa l'errore a regime di $e_{\infty} = 0.04$, analogamente alla progettazione del regolatore.
 
 Il sistema non lineare rimane stabile e converge a $\theta_e$ per ogni variazione ragionevole dell'angolo e della velocità angolare iniziali, come mostrato nelle figure \ref{fig:theta_iniziali} e \ref{fig:omega_iniziali}.
 
