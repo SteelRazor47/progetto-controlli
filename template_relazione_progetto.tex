@@ -7,7 +7,7 @@
 \geometry{a4paper, top=2cm, bottom=3cm, left=1.5cm, right=1.5cm, heightrounded, bindingoffset=5mm}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{gensymb}
+\usepackage{textcomp, gensymb}
 \usepackage{graphicx}
 \usepackage{psfrag,amsmath,amsfonts,verbatim}
 \usepackage{xcolor}
@@ -71,12 +71,12 @@
 Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figura \ref{fig:system_image}, la cui dinamica viene descritta dalle seguenti equazioni differenziali  
 %
 \begin{subequations}\label{eq:system}
-\begin{align}
-	J(\theta) = \dot{\omega} = C_m - \beta\omega - k\theta 
-\end{align}
-\begin{align}
-	J(\theta) = J_0 + \sum_{n = 0}^{4}J_i\cos (i\theta +\psi_i)
-\end{align}
+	\begin{align}
+		J(\theta) = \dot{\omega} = C_m - \beta\omega - k\theta 
+	\end{align}
+	\begin{align}
+		J(\theta) = J_0 + \sum_{n = 0}^{4}J_i\cos (i\theta +\psi_i)
+	\end{align}
 \end{subequations}
 %
 dove $\omega$(t) rappresenta la velocità angolare e in cui:
@@ -85,7 +85,7 @@ dove $\omega$(t) rappresenta la velocità angolare e in cui:
 	\item $C_m$ è la coppia generata dal motore elettrico;
 	\item $\beta$ è l'attrito viscoso;
 	\item k è il coefficiente di elasticità del disco;
-  \end{itemize}
+\end{itemize}
 %
 \begin{figure}[h!]
 	\centering
@@ -98,11 +98,11 @@ dove $\omega$(t) rappresenta la velocità angolare e in cui:
 Innanzitutto, esprimiamo il sistema~\eqref{eq:system} nella seguente forma di stato
 %
 \begin{subequations}
-\begin{align}\label{eq:state_form}
-	\dot{x} &= f(x,u)
-	\\
-	y &= h(x,u).
-\end{align}
+	\begin{align}\label{eq:state_form}
+		\dot{x} & = f(x,u)
+		\\
+		y       & = h(x,u).
+	\end{align}
 \end{subequations}
 %
 Pertanto, andiamo individuare lo stato $x$, l'ingresso $u$ e l'uscita $y$ del sistema come segue 
@@ -114,7 +114,7 @@ Pertanto, andiamo individuare lo stato $x$, l'ingresso $u$ e l'uscita $y$ del si
 Coerentemente con questa scelta, ricaviamo dal sistema~\eqref{eq:system} la seguente espressione per le funzioni $f$ ed $h$
 %
 \begin{align}
-	f(x,u) &:= 
+	f(x,u) & := 
 	\begin{bmatrix}
 		f_1(x,u)
 		\\[0.5em] 
@@ -126,36 +126,36 @@ Coerentemente con questa scelta, ricaviamo dal sistema~\eqref{eq:system} la segu
 		\dfrac{u - \beta x_2 - kx_1}{J(x_1)}
 	\end{bmatrix}
 	\\[0.5em] 
-	h(x,u) &:= x_1
+	h(x,u) & := x_1
 \end{align}
 %
 Una volta calcolate $f$ ed $h$ esprimiamo~\eqref{eq:system} nella seguente forma di stato
 %
 \begin{subequations}\label{eq:our_system_state_form}
-\begin{align}
-	\begin{bmatrix}
-		\dot{x}_1
-		\\
-		\dot{x}_2
-	\end{bmatrix} &= 
-	\begin{bmatrix}
-		f_1(x,u)
-		\\[0.5em] 
-		f_2(x,u)
-	\end{bmatrix}\label{eq:state_form_1}
-	\\[0.5em]
-	y &= h(x, u)
-\end{align}
+	\begin{align}
+		\begin{bmatrix}
+			\dot{x}_1
+			\\
+			\dot{x}_2
+		\end{bmatrix} & = 
+		\begin{bmatrix}
+			f_1(x,u)
+			\\[0.5em] 
+			f_2(x,u)
+		\end{bmatrix}\label{eq:state_form_1}
+		\\[0.5em]
+		y               & = h(x, u)
+	\end{align}
 \end{subequations}
 %
 Per trovare la coppia di equilibrio $(x_e, u_e)$ di~\eqref{eq:our_system_state_form}, andiamo a risolvere il seguente sistema di equazioni a partire dal valore fornito di $\theta_e=\frac{\pi}{3}$
 %
 \begin{align}
 	\left\{\begin{matrix}
-		f(x_e, u_e)=0  
-		\\[0.5em]
-		x_{e1} = \frac{\pi}{3}
-	\end{matrix}\right.
+		       f(x_e, u_e)=0  
+		       \\[0.5em]
+		       x_{e1} = \frac{\pi}{3}
+	       \end{matrix}\right.
 \end{align}
 %
 dal quale otteniamo
@@ -167,7 +167,7 @@ dal quale otteniamo
 Definiamo le variabili alle variazioni $\delta x$, $\delta u$ e $\delta y$ come 
 %
 \begin{align*}
-	\delta x &= x-x_e, 
+	\delta x & = x-x_e, 
 	\quad
 	\delta u = u-u_e, 
 	\quad
@@ -177,37 +177,37 @@ Definiamo le variabili alle variazioni $\delta x$, $\delta u$ e $\delta y$ come
 L'evoluzione del sistema espressa nelle variabili alle variazioni pu\`o essere approssimativamente descritta mediante il seguente sistema lineare
 %
 \begin{subequations}\label{eq:linearized_system}
-\begin{align}
-	\delta \dot{x} &= A\delta x + B\delta u
-	\\
-	\delta y &= C\delta x + D\delta u,
-\end{align}
+	\begin{align}
+		\delta \dot{x} & = A\delta x + B\delta u
+		\\
+		\delta y       & = C\delta x + D\delta u,
+	\end{align}
 \end{subequations}
 %
 dove le matrici $A$, $B$, $C$ e $D$ vengono calcolate come
 %
 \begin{subequations}\label{eq:matrices}
-\begin{align}
-	A &= \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-		x = x_e
+	\begin{align}
+		A & = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+			                                                  x = x_e
+			                                                  \\
+			                                                  u = u_e \end{smallmatrix}}
 		\\
-		u = u_e \end{smallmatrix}}
-	\\
-	B &= \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-		x = x_e
+		B & = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+			                                                  x = x_e
+			                                                  \\
+			                                                  u = u_e \end{smallmatrix}}
 		\\
-		u = u_e \end{smallmatrix}}
-	\\
-	C &= \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-		x = x_e
+		C & = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+			                                                  x = x_e
+			                                                  \\
+			                                                  u = u_e \end{smallmatrix}}
 		\\
-		u = u_e \end{smallmatrix}}
-	\\
-	D &= \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-		x = x_e
-		\\
-		u = u_e \end{smallmatrix}}
-\end{align}
+		D & = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+			                                                  x = x_e
+			                                                  \\
+			                                                  u = u_e \end{smallmatrix}}
+	\end{align}
 \end{subequations}
 %
 \section{Calcolo Funzione di Trasferimento}
@@ -216,7 +216,7 @@ In questa sezione, andiamo a calcolare la funzione di trasferimento $G(s)$ dall'
 %
 %
 \begin{align}\label{eq:transfer_function}
-G(s) = C(sI-A)^{-1}B + D = \frac{0.02}{1+0.09919\frac{s}{4.96}+\frac{s^2}{4.96^2}}
+	G(s) = C(sI-A)^{-1}B + D = \frac{0.02}{1+0.09919\frac{s}{4.96}+\frac{s^2}{4.96^2}}
 \end{align}
 %
 Dunque il sistema linearizzato~\eqref{eq:linearized_system} è caratterizzato dalla funzione di trasferimento~\eqref{eq:transfer_function} con 2 poli complessi coniugati $p_1$ e $p_2$:
@@ -239,10 +239,10 @@ Le specifiche da soddisfare sono
 \begin{itemize}
 	\item[1)] Errore a regime $|e_{\infty}| \leq e^{\star}$ in risposta a un gradino $\omega (t) = 1(t)$ e $d(t)=1(t)$
 	\item[2)] Per garantire una certa robustezza del sistema si deve avere un margine di fase $M_f \geq 30^{\degree}$.
-	\item[3)] Il sistema può accettare una sovraelongazione percentuale al massimo del 10\% : S\% $\leq 10\%$. 
+	\item[3)] Il sistema può accettare una sovraelongazione percentuale al massimo del 10\% : S\% $\leq 10\%$.
 	\item[4)] Il tempo di assestamento alla $\epsilon_{\%}$ = 5\% deve essere inferiore al valore fissato: $T_{a, \epsilon} = 0.008s$ .
 	\item[5)] Il disturbo sull'uscita d(t), con una banda limitata nel range di pulsazioni $[0, 0.5]$, deve essere abbattuto di almeno 30 dB.
-	\item[6)] Il rumore sull'uscita n(t), con una banda limitata nel range di pulsazioni $[5 \cdot 10^4, 5 \cdot 10^6]$, deve essere abbattuto di almeno 65 dB. 
+	\item[6)] Il rumore sull'uscita n(t), con una banda limitata nel range di pulsazioni $[5 \cdot 10^4, 5 \cdot 10^6]$, deve essere abbattuto di almeno 65 dB.
 \end{itemize}
 %
 Andiamo ad effettuare la mappatura punto per punto le specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore \dots  
@@ -337,7 +337,7 @@ In Figura \ref{fig:step_response}, si mostra la risposta del sistema linearizzat
 Il grafico della risposta al gradino unitario non interseca né la patch rossa, che corrisponde a valori per cui non sarebbe rispettato il vincolo sulla sovraelongazione,
 né la patch verde, la quale corrisponde a valori per cui il vincolo sul tempo di assestamento risulterebbe non rispettato. 
 Inoltre, la risposta al gradino unitario a regime si stabilizza a $0.9690$, valore che ricade entro l'intervallo di errore di $\pm0.04$ richiesto dalle specifiche.
- 
+
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.9\linewidth]{./images/stepRespLin.png}
@@ -362,7 +362,7 @@ viene moltiplicato per il guadagno (matrice $C\cdot u$) e a quest'ultimo viene s
 dove viene sommata con il valore al quale lo stato \`e all'equilibrio.
 
 
-\begin{figure}
+\begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.9\linewidth]{./images/simulink1.png}
 	\caption{Modello Simulink.}
@@ -380,20 +380,83 @@ Nella figura \ref*{fig:step_response_non_lin_uni} \dots
 
 \section{Punti opzionali}
 
-\subsection{Primo punto}
+\subsection{Animazione}
 
-\dots 
+L'animazione del sistema controllato è stata implementata in Matlab disegnando un grafico frame per frame in base all'angolo $\theta$ simulato.
+Partendo da 3 posizioni fisse, ossia il centro della ruota(??????) e i cardini(?????) delle travi fissati al suolo, e in base all'angolo $\theta$ vengono calcolate le posizioni dei 3 cardini(?) liberi.
+
+In particolare si noti come i due cardini(?) della trave(?) connessa alla ruota devono appartenere a due circonferenze. La prima è centrata chiaramente sul centro della ruota(?), per la seconda si noti che essendo il corpo rigido un parallelogramma, i tre cardini(?) della trave(?) orizzontale percorrono tutti delle circonferenze con raggio pari alla lunghezza delle travi(?) verticali. È quindi possibile individuare una posizione univoca del secondo cardine in funzione della posizione del primo e della lunghezza della trave(?)
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.4\linewidth]{./images/animazione_costruzione.png}
+	\caption{Costruzione dei punti utilizzati per l'animazione}
+	\label{fig:animazione_costruzione}
+\end{figure}
 
 \subsection{Secondo punto}
 
-\dots
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/theta_iniziali.png}
+		\caption{Andamento di $\delta y$ al variare dell'angolo iniziale}
+		\label{fig:theta_iniziali}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.4\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/omega_iniziali.png}
+		\caption{Andamento di $\delta y$ al variare della velocità angolare iniziale, $0.1 \le \lvert\theta\rvert \le 10^6$}
+		\label{fig:omega_iniziali}
+	\end{subfigure}
+	
+	\caption{}
+	\label{fig:stato_iniziale}
+\end{figure}
+
+Il regolatore realizzato è stato testato con un riferimento $\theta(t)=\theta_e$ sul sistema non lineare al variare dello stato iniziale. Essendo il regolatore progettato sul sistema linearizzato attorno a $\theta_e=\pi/3$, il riferimento in ingresso è data da $w(t)=\delta y=0$. Per variare lo stato iniziale del sistema è sufficiente variare lo stato iniziale dell'integratore in uscita al sistema dinamico nel modello in figura \ref{fig:simulink}.
+
+Il sistema è considerato convergente al riferimento se soddisfa l'errore a regime di $e_{\inf} = 0.04$, analogamente alla progettazione del regolatore.
+
+Il sistema non lineare rimane stabile e converge a $\theta_e$ per ogni variazione ragionevole dell'angolo e della velocità angolare iniziali, come mostrato nelle figure \ref{fig:theta_iniziali} e \ref{fig:omega_iniziali}.
+
+
 
 \subsection{Terzo punto}
 
-\dots
+Per testare se il sistema non lineare controllato rispetta le specifiche in risposta a diversi gradini, sono necessarie due simulazioni. La prima, di lunga durata, controlla se la risposta rispetta l'errore a regime di 0.04. La seconda per verificare le prestazioni dinamiche delle risposte.
+I gradini nell'intervallo [0, 1.5] rispettano l'errore a regime, mostrato in figura \ref*{fig:gradini_statico}. Per quanto riguarda la precisione dinamica invece, tutti i gradini rispettano il vincolo di sovraelungazione ma solo i gradini nell'intervallo [0.1, 0.8] rispettano il tempo di assestamento al 5\%(figure \ref*{fig:gradini_dinamico_low} e \ref*{fig:gradini_dinamico_high}).
+
+\begin{figure}[h!]
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/gradini_statico.png}
+		\caption{Precisione statica}
+		\label{fig:gradini_statico}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/gradini_dinamico_low.png}
+		\caption{Precisione dinamica}
+		\label{fig:gradini_dinamico_low}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.3\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/gradini_dinamico_high.png}
+		\caption{Precisione dinamica}
+		\label{fig:gradini_dinamico_high}
+	\end{subfigure}
+	
+	\caption{Verifica specifiche}
+	\label{fig:specifiche_gradini}
+\end{figure}
 
 \section{Conclusioni}
 
-\dots
+In conclusione, sebbene il regolatore progettato sia efficiace e rispetti le specifiche sul sistema linearizzato, esso non offre le stesse prestazioni nel controllo del sistema non lineare. Non viene infatti rispettata la specifica sul tempo di assestamento al 5\% per $w(t) = 1(t)$. Cioè è dovuto al comportamento inerziale(???) non lineare del sistema, non catturabile nella linearizzazione, che porta a un maggior ritardo nell'inseguimento del riferimento.
+Il regolatore è però in grado di riportare il sistema non lineare alle condizioni di equilibrio per ogni angolo e velocità inziale ragionevoli.
+Inoltre, sebbene il controllo non sia efficace per un gradino di ampiezza $W=1$, lo diventa per tutti i gradini con ampiezza nel range $[0, 0.9)$
 
 \end{document}

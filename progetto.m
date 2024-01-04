@@ -11,6 +11,7 @@ A_d = 30;
 A_n = 65;
 omega_d_max = 0.5;
 omega_n_min = 5e4;
+sim_sampletime = 1e-6;
 
 beta = 1;
 J0 = 1.7;
@@ -29,7 +30,6 @@ omega_e = 0;
 theta_e = pi / 3;
 u_e = beta * omega_e + k * theta_e;
 x_e = [theta_e; omega_e];
-x_sim = x_e;
 
 %% Linearizzazione
 df2dx1 = (( k*theta_e+beta*omega_e-u_e )*Jdot(theta_e) - k*J(theta_e))/J(theta_e)^2;
@@ -147,48 +147,99 @@ plot(tt,y_n,'b')
 grid on
 legend('n(t)','y_n(t')
 
-%% Angolo iniziale
+%% Punti opzionali
+
+% Angolo iniziale
 figure();
 hold on, grid on, zoom on;
 
-for theta = 0:2*pi/10:2*pi
-    x_sim = [theta; 0];
-    out = sim("SdC_progetto.slx");
-    plot(out.y_sim);
+W_sim = 0;
+theta_range = -180:45:180;
+for dtheta = theta_range
+    x_sim = x_e + [deg2rad(dtheta); 0];
+    out = sim("SdC_progetto_fast.slx","StopTime","8");
+    data = out.y_sim.Data - theta_e;
+    plot(out.y_sim.Time, rad2deg(data));
 end
-legend('\theta = 0', '\theta = {2\pi}/{10}','\theta = {4\pi}/{10}','\theta = {6\pi}/{10}','\theta = {8\pi}/{10}', '\theta = \pi', ...
-    '\theta = {12\pi}/{10}','\theta = {14\pi}/{10}','\theta = {16\pi}/{10}','\theta = {18\pi}/{10}','\theta = 2\pi')
+yline(rad2deg([-e_max e_max]), 'HandleVisibility', 'off');
+legendCell = strcat('d\theta = ',string(num2cell(theta_range)));
+legend(legendCell);
 
-%% Velocità iniziale
+% Velocità iniziale
 figure();
 hold on, grid on, zoom on;
 
-for vel = 0:1000:10000
-    x_sim = [theta_e; vel];
-    out = sim("SdC_progetto.slx");
-    plot(out.y_sim);
+W_sim = 0;
+omega_range = 10.^(-1:6);
+omega_range = [-omega_range omega_range];
+for vel = omega_range
+    x_sim = x_e + [0; deg2rad(vel)];
+    out = sim("SdC_progetto_fast.slx","StopTime","8");
+    data = out.y_sim.Data - theta_e;
+    plot(out.y_sim.Time, rad2deg(data));
 end
-legend('\omega = 0', '\omega = 1000','\omega = 2000','\omega = 3000','\omega = 4000', '\omega = 5000', ...
-    '\omega = 6000','\omega = 7000','\omega = 8000','\omega = 9000','\omega = 10000')
+yline(rad2deg([-e_max e_max]), 'HandleVisibility', 'off');
+%legendCell = strcat('d\omega = ',string(num2cell(omega_range)));
+%legend(legendCell);
 
 %% Animazione
-
-%x_sim = x_e;
-%out = sim("SdC_progetto.slx");
-%animation(out.y_sim(1).Data, 15);
+x_sim = x_e;
+W_sim = W;
+out = sim("SdC_progetto.slx","StopTime","0.01");
+animation(out.y_sim);
 
 %% Gradini
+
+x_sim = x_e;
+w_range = -0.9:0.1:0.5;
+LVs = cell(length(w_range), 1);
+
+%prestazioni statiche
 figure();
 hold on, grid on, zoom on;
 
-for w = 0:2*pi/10:2*pi
-    x_sim = x_e;
-    W = w;
-    out = sim("SdC_progetto.slx");
-    plot(out.y_sim);
+T_simulation = 10;
+for i = 1:length(w_range)
+    W_sim = W + w_range(i);
+
+    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
+    data = out.y_sim.Data - theta_e;
+    p = plot(out.y_sim.Time, data, 'LineWidth',1.0);
+    LVs{i} = out.y_sim.Data(end) - theta_e;
+
+    line([0.9*T_simulation T_simulation],[W_sim-e_max W_sim-e_max],'HandleVisibility','off', 'Color', p.Color); % errore a regime
+    line([0.9*T_simulation T_simulation],[W_sim+e_max W_sim+e_max],'HandleVisibility','off', 'Color', p.Color); 
 end
-legend('w = 0', 'w = {2\pi}/{10}','w = {4\pi}/{10}','w = {6\pi}/{10}','w = {8\pi}/{10}', 'w = \pi', ...
-    'w = {12\pi}/{10}','w = {14\pi}/{10}','w = {16\pi}/{10}','w = {18\pi}/{10}','w = 2\pi')
+legendCell = strcat('W = ',string(num2cell(W+w_range)));
+legend(legendCell);
+
+
+% prestazioni dinamiche
+
+T_simulation = 3*T_a5;
+figure();
+hold on, grid on, zoom on;
+for i = 1:length(w_range)
+    clf;
+    hold on, grid on, zoom on;
+    
+    W_sim = W + w_range(i);
+
+    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
+    data = out.y_sim.Data - theta_e;
+    p = plot(out.y_sim.Time, data);
+    LV = LVs{i};
+    patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
+
+    % vincolo tempo di assestamento al 5%
+    patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
+    patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
+
+    ylim([0,LV*2+0.01]);
+
+    legend(strcat('W = ', num2str(W + w_range(i))), 'Vincolo sovraelungazione', 'Vincolo assestamento');
+    pause;
+end
 
 %% Funzioni
 function [out] = noise_gen(omega)
@@ -201,7 +252,9 @@ function [out] = noise_gen(omega)
     out = @sum;
 end
 
-function [] = animation(thetas, figure_n)
+function [] = animation(y_sim)
+    thetas = y_sim.Data;
+    tt = y_sim.Time;
     wheel_center = [0 2];
     wheel_r = 0.6;
     vbarL_bottom = [2.4 0];
@@ -209,31 +262,71 @@ function [] = animation(thetas, figure_n)
     vbar_length = 2;
     bar_length = 2.4;
     bar_c = [2 0];
+    pinbar_length = norm((wheel_center+[0 wheel_r]) - (bar_c + [0 vbar_length]));
 
     % circle: y^2 + (x-2)^2 = 4
-    figure(figure_n);
+    f = figure();
 
-    for i=1:length(thetas)
-        clf(figure_n);
+    for i=1:100:length(thetas)
+        clf(f);
         grid on;
-        axis([-1 6 0 4]);
         axis equal;
-        theta = -thetas(i);
+        axis manual;
+        axis([-1 6 -1 4]);
+
+        theta = pi/2-thetas(i);
         pin1 = wheel_center + wheel_r * [cos(theta), sin(theta)];
-        [cx, cy] = findPointOnCircle(pin1, bar_length, bar_c, vbar_length);
+        [cx, cy] = findPointOnCircle(pin1, pinbar_length, bar_c, vbar_length);
         hbar_left = [cx cy];
         vbarL_top = hbar_left + [bar_length-vbar_length 0];
         vbarR_top = hbar_left + [bar_length 0];
 
-        viscircles(wheel_center, wheel_r);
-        %viscircles(bar_c, vbar_length);
-        line([pin1(1) hbar_left(1)], [pin1(2) hbar_left(2)]);
-        line([hbar_left(1) vbarR_top(1)], [hbar_left(2) vbarR_top(2)]);
-        line([vbarL_top(1) vbarL_bottom(1)], [vbarL_top(2) vbarL_bottom(2)]);
-        line([vbarR_top(1) vbarR_bottom(1)], [vbarR_top(2) vbarR_bottom(2)]);
+        pos = [wheel_center-(wheel_r*1.25) 2*(wheel_r*1.25) 2*(wheel_r*1.25)];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
 
-        pause(0.1);
+        %pos = [bar_c-vbar_length 2*vbar_length 2*vbar_length];
+        %rectangle('Position',pos,'Curvature',[1 1]);
+        
+        patch([-1,6,6,-1],[0,0,-1,-1],'g','FaceAlpha',0.1,'EdgeAlpha',0.1, 'FaceColor', 'Black');
+
+        vbar_angle = atan((vbarL_top(2) - vbarL_bottom(2))/(vbarL_top(1)-vbarL_bottom(1)));
+        dx = 0.2 * cos(vbar_angle);
+        dy = 0.2 *sin(vbar_angle);
+        line([vbarL_top(1)+dx vbarL_bottom(1)-dx], [vbarL_top(2)+dy vbarL_bottom(2)-dy], 'Color', [1 0 0 0.2], 'LineWidth', 10);
+        line([vbarR_top(1)+dx vbarR_bottom(1)-dx], [vbarR_top(2)+dy vbarR_bottom(2)-dy], 'Color', [1 0 0 0.2], 'LineWidth', 10);
+        line([hbar_left(1)-0.2 vbarR_top(1)+0.2], [hbar_left(2) vbarR_top(2)], 'Color', [1 0 0 0.2], 'LineWidth', 10);
+        hbarL_angle = atan((hbar_left(2) - pin1(2))/(hbar_left(1)-pin1(1)));
+        dx = 0.1 * cos(hbarL_angle);
+        dy = 0.1 *sin(hbarL_angle);
+        line([pin1(1)-dx hbar_left(1)+dx], [pin1(2)-dy hbar_left(2)+dy], 'Color', [1 0 0 0.2], 'LineWidth', 6);
+
+        line([pin1(1) hbar_left(1)], [pin1(2) hbar_left(2)], 'Color', 'Black');
+        line([hbar_left(1) vbarR_top(1)], [hbar_left(2) vbarR_top(2)], 'Color', 'Black');
+        line([vbarL_top(1) vbarL_bottom(1)], [vbarL_top(2) vbarL_bottom(2)], 'Color', 'Black');
+        line([vbarR_top(1) vbarR_bottom(1)], [vbarR_top(2) vbarR_bottom(2)], 'Color', 'Black');
+
+
+        pos = [pin1-0.05 2*0.05 2*0.05];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+
+        pos = [hbar_left-0.05 2*0.05 2*0.05];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+
+        pos = [vbarL_top-0.09 2*0.09 2*0.09];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        pos = [vbarR_top-0.09 2*0.09 2*0.09];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+
+        pos = [vbarL_bottom-0.09 2*0.09 2*0.09];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        pos = [vbarR_bottom-0.09 2*0.09 2*0.09];
+        rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        if i == 1
+            pause;
+        end
+        pause(tt * 200);
     end  
+    pause;
 end
 
 
