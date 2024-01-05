@@ -144,13 +144,54 @@ plot(tt,nn,'m')
 plot(tt,y_n,'b')
 legend('n(t)','y_n(t)')
 
+%% Check prestazioni linearizzato
+x_sim = x_e;
+W_sim = W;
+T_simulation = 10;
+out = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data(:);
+LV = data(end);
+
+figure();
+hold on; zoom on; grid on;
+plot(out.y_sim.Time, data);
+
+T_simulation = 3*T_a5;
+out = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data(:);
+
+figure();
+hold on; zoom on; grid on;
+
+plot(out.y_sim.Time, data);
+
+% vincolo sovraelongazione
+patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
+
+% vincolo tempo di assestamento al 5%
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
+
+ylim([0,LV*2]);
+
+Legend_step = ["Risposta al gradino (linearizzato)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+legend(Legend_step);
+
 %% Check prestazioni non linearizzato
 x_sim = x_e;
 W_sim = W;
-T_simulation =3;
-out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+T_simulation = 10;
+out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
 data = out.y_sim.Data(:) - theta_e;
 LV = data(end);
+
+figure();
+hold on; zoom on; grid on;
+plot(out.y_sim.Time, data);
+
+T_simulation = 3*T_a5;
+out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data(:) - theta_e;
 
 figure();
 hold on; zoom on; grid on;
@@ -167,6 +208,39 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 ylim([0,LV*2]);
 
 Legend_step = ["Risposta al gradino (non lineare)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+legend(Legend_step);
+
+%% Check prestazioni non linearizzato con disturbi
+x_sim = x_e;
+W_sim = W;
+T_simulation = 10;
+out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data(:) - theta_e;
+LV = data(end);
+
+figure();
+hold on; zoom on; grid on;
+plot(out.y_sim.Time, data);
+
+T_simulation = 3*T_a5;
+out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+data = out.y_sim.Data(:) - theta_e;
+
+figure();
+hold on; zoom on; grid on;
+
+plot(out.y_sim.Time, data);
+
+% vincolo sovraelongazione
+patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
+
+% vincolo tempo di assestamento al 5%
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
+patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
+
+ylim([0,LV*2]);
+
+Legend_step = ["Risposta al gradino (non lineare con disturbi)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
 
 %% Confronto
@@ -245,7 +319,7 @@ animation(out.y_sim);
 %% Gradini
 
 x_sim = x_e;
-w_range = -0.9:0.1:0.5;
+w_range = -0.1:0.1:0.5;
 LVs = cell(length(w_range), 1);
 
 %prestazioni statiche
@@ -322,7 +396,7 @@ function [] = animation(y_sim)
     % circle: y^2 + (x-2)^2 = 4
     f = figure();
 
-    for i=1:100:length(thetas)
+    for i=1:length(thetas)
         clf(f);
         grid on;
         axis equal;
