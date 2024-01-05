@@ -29,6 +29,9 @@
 \usepackage{color}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{caption}
+
+\captionsetup[figure]{justification=centering}
 
 \setlength{\parindent}{0pt}
 
@@ -374,7 +377,6 @@ Nella figura \ref*{fig:step_response_non_lin_uni} si mostra la risposta del sist
 
 Si nota immediatamente come essa vada ad intersecare le patch sia rossa che verde. Ciò accade perché il regolatore è progettato sul sistema linearizzato, il quale non cattura il comportamento non lineare del sistema
 e questo non ci assicura che il sistema non lineare rispetti precisamente le specifiche imposte per il sistema linearizzato.
-\`E però possibile osservare la somiglianza fra la risposta del sistema non lineare e quella del sistema linearizzato, mostrata nella figura \ref*{fig:confronto}.
 
 \begin{figure}[h!]
 	\centering
@@ -383,11 +385,27 @@ e questo non ci assicura che il sistema non lineare rispetti precisamente le spe
 	\label{fig:step_response_non_lin_uni}
 \end{figure}
 
+Nella figura \ref*{fig:confronto} è possibile osservare come, per tempi brevi, la risposta al gradino del sistema linearizzato e del sistema non lineare (sia in presenza che in assenza di disturbi) siano molto simili.
+Ciò non si verifica nel caso di tempi più lunghi, dove la presenza di disturbi porta l'uscita del sistema non lineare a divergere dal riferimento, assumendo un comportamento non stabile - cosa che non avviene in assenza di distubi -
+come mostrato nella figura \ref*{fig:confrontoReg}.
+
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.75\linewidth]{./images/confronto.png}
-	\caption{Confronto fra la risposta del sistema non lineare e lineare ad un gradino unitario.}
-	\label{fig:confronto}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/confronto.png}
+		\caption{Andamento della risposta al gradino per $0\leq t\leq 0.01$}
+		\label{fig:confronto}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{./images/confrontoReg.png}
+		\caption{Andamento della risposta al gradino per $0\leq t\leq 10$}
+		\label{fig:confrontoReg}
+	\end{subfigure}
+	
+	\caption{}
+	\label{fig:confronti}
 \end{figure}
 
 \section{Punti opzionali}
