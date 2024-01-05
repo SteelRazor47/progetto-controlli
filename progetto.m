@@ -249,14 +249,17 @@ x_sim = x_e;
 W_sim = W;
 outl = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
 out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+out_nodist = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
 data = out.y_sim.Data(:) - theta_e;
+data_nodist = out_nodist.y_sim.Data(:) - theta_e;
 
 figure();
 hold on; zoom on; grid on;
 plot(outl.y_sim,'b');
 plot(out.y_sim.Time, data, 'r');
+plot(out_nodist.y_sim.Time, data_nodist, 'm');
 
-Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lineare)"];
+Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lin. con disturbi)"; "Risposta al gradino (non lin. no disturbi)"];
 legend(Legend_step);
 
 %% Confronto regime
@@ -265,14 +268,17 @@ x_sim = x_e;
 W_sim = W;
 outl = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
 out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
+out_nodist = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
 data = out.y_sim.Data(:) - theta_e;
+data_nodist = out_nodist.y_sim.Data(:) - theta_e;
 
 figure();
 hold on; zoom on; grid on;
 plot(outl.y_sim,'b');
 plot(out.y_sim.Time, data, 'r');
+plot(out_nodist.y_sim.Time, data_nodist, 'm');
 
-Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lineare)"];
+Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lin. con disturbi)"; "Risposta al gradino (non lin. no disturbi)"];
 legend(Legend_step);
 
 %% Punti opzionali
@@ -453,7 +459,7 @@ function [] = animation(y_sim)
         if i == 1
             pause;
         end
-        pause(tt * 200);
+        pause(tt * 0.1);
     end  
     pause;
 end
