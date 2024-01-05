@@ -191,24 +191,24 @@ dove le matrici $A_e$, $B_e$, $C_e$ e $D_e$ vengono calcolate come
 
 \begin{subequations}\label{eq:matrices}\centering
 	$A_e = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-															x = x_e
-															\\
-															u = u_e \end{smallmatrix}}$
+			x = x_e
+			\\
+			u = u_e \end{smallmatrix}}$
 	\quad
 	$B_e = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-															x = x_e
-															\\
-															u = u_e \end{smallmatrix}}$
+			x = x_e
+			\\
+			u = u_e \end{smallmatrix}}$
 	\quad
 	$C_e = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
-															x = x_e
-															\\
-															u = u_e \end{smallmatrix}}$
+			x = x_e
+			\\
+			u = u_e \end{smallmatrix}}$
 	\quad
 	$D_e = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
-															x = x_e
-															\\
-															u = u_e \end{smallmatrix}}$
+			x = x_e
+			\\
+			u = u_e \end{smallmatrix}}$
 \end{subequations}
 %
 \section{Calcolo Funzione di Trasferimento}
@@ -387,9 +387,9 @@ Si nota immediatamente come essa abbia un valore iniziale poco superiore ad $1$,
 \subsection{Animazione}
 
 L'animazione del sistema controllato è stata implementata in Matlab disegnando un grafico frame per frame in base all'angolo $\theta$ simulato.
-Partendo da 3 posizioni fisse, ossia il centro della ruota(??????) e i cardini(?????) delle travi fissati al suolo, e in base all'angolo $\theta$ vengono calcolate le posizioni dei 3 cardini(?) liberi.
+Partendo da 3 posizioni fisse, ossia il centro della ruota(?) e i cardini(?) delle travi fissati al suolo, e in base all'angolo $\theta$ vengono calcolate le posizioni dei 3 cardini liberi.
 
-In particolare si noti come i due cardini(?) della trave(?) connessa alla ruota devono appartenere a due circonferenze. La prima è centrata chiaramente sul centro della ruota(?), per la seconda si noti che essendo il corpo rigido un parallelogramma, i tre cardini(?) della trave(?) orizzontale percorrono tutti delle circonferenze con raggio pari alla lunghezza delle travi(?) verticali. È quindi possibile individuare una posizione univoca del secondo cardine in funzione della posizione del primo e della lunghezza della trave(?)
+In particolare si noti come i due cardini della trave(?) connessa alla ruota devono appartenere a due circonferenze. La prima è centrata chiaramente sul centro della ruota, per la seconda si noti che essendo il corpo rigido un parallelogramma, i tre cardini della trave orizzontale percorrono tutti delle circonferenze con raggio pari alla lunghezza delle travi verticali. È quindi possibile individuare una posizione univoca del secondo cardine in funzione della posizione del primo e della lunghezza della trave.
 
 \begin{figure}[h!]
 	\centering
@@ -430,7 +430,8 @@ Il sistema non lineare rimane stabile e converge a $\theta_e$ per ogni variazion
 \subsection{Terzo punto}
 
 Per testare se il sistema non lineare controllato rispetta le specifiche in risposta a diversi gradini, sono necessarie due simulazioni. La prima, di lunga durata, controlla se la risposta rispetta l'errore a regime di 0.04. La seconda per verificare le prestazioni dinamiche delle risposte.
-I gradini nell'intervallo [0, 1.5] rispettano l'errore a regime, mostrato in figura \ref*{fig:gradini_statico}. Per quanto riguarda la precisione dinamica invece, tutti i gradini rispettano il vincolo di sovraelungazione ma solo i gradini nell'intervallo [0.1, 0.8] rispettano il tempo di assestamento al 5\%(figure \ref*{fig:gradini_dinamico_low} e \ref*{fig:gradini_dinamico_high}).
+Per quanto riguarda la precisione dinamica i gradini nell'intervallo [1.1, 1.4) rispettano i vincoli di sovraelungazione e tempo di assestamento al 5\%(figure \ref{fig:gradini_dinamico_low} e \ref{fig:gradini_dinamico_high}).
+In questo intervallo tutti i gradini rispettano l'errore a regime, mostrato in figura \ref{fig:gradini_statico}.
 
 \begin{figure}[h!]
 	\centering
@@ -459,8 +460,9 @@ I gradini nell'intervallo [0, 1.5] rispettano l'errore a regime, mostrato in fig
 
 \section{Conclusioni}
 
-In conclusione, sebbene il regolatore progettato sia efficiace e rispetti le specifiche sul sistema linearizzato, esso non offre le stesse prestazioni nel controllo del sistema non lineare. Non viene infatti rispettata la specifica sul tempo di assestamento al 5\% per $w(t) = 1(t)$. Cioè è dovuto al comportamento inerziale(???) non lineare del sistema, non catturabile nella linearizzazione, che porta a un maggior ritardo nell'inseguimento del riferimento.
-Il regolatore è però in grado di riportare il sistema non lineare alle condizioni di equilibrio per ogni angolo e velocità inziale ragionevoli.
-Inoltre, sebbene il controllo non sia efficace per un gradino di ampiezza $W=1$, lo diventa per tutti i gradini con ampiezza nel range $[0, 0.9)$
+In conclusione, sebbene il regolatore progettato sia efficiace e rispetti le specifiche sul sistema linearizzato, esso non offre le stesse prestazioni nel controllo del sistema non lineare. Non viene infatti rispettata le specifiche dinamiche sul tempo di assestamento al 5\% e sulla sovraelungazione per $w(t) = 1(t)$. Cioè è dovuto al comportamento non lineare del sistema, non catturabile nella linearizzazione, che porta a una differenza nell'inseguimento del riferimento.
+Inoltre il regolatore non è in grado di attenuare correttamente i disturbi di misura nel sistema non lineare, il che porta l'uscita a divergere dal riferimento.
+Il regolatore è però, in assenza di disturbi, in grado di riportare il sistema non lineare alle condizioni di equilibrio per ogni angolo e velocità inziale ragionevoli.
+Inoltre, sebbene il controllo non sia efficace per un gradino di ampiezza $W=1$, lo diventa per tutti i gradini con ampiezza nel range $[1.1, 1.4)$.
 
 \end{document}
