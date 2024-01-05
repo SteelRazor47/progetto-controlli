@@ -74,7 +74,7 @@ Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figu
 %
 \begin{subequations}\label{eq:system}
 	\begin{align}
-		J(\theta) = \dot{\omega} = C_m - \beta\omega - k\theta 
+		J(\theta)\dot{\omega} = C_m - \beta\omega - k\theta 
 	\end{align}
 	\begin{align}
 		J(\theta) = J_0 + \sum_{n = 0}^{4}J_i\cos (i\theta +\psi_i)
@@ -372,14 +372,22 @@ dove le viene sottratto il valore di $x_e$, ossia l'equilibrio per lo stato. Que
 
 Nella figura \ref*{fig:step_response_non_lin_uni} si mostra la risposta del sistema non lineare ad un gradino unitario, calcolata utilizzando il sistema spiegato in precedenza (figura \ref*{fig:simulink}).
 
-Si nota immediatamente come essa abbia un valore iniziale poco superiore ad $1$, questo perch\'e il sistema \`e stato precedentemente linearizzato in un intorno di $\theta_e$, che \`e pari a $\frac{\pi}{3} \simeq 1.047$.
-\`E inoltre possibile osservare la somiglianza fra la risposta del sistema non lineare e quella del sistema linearizzato, mostrata in precedenza (figura \ref*{fig:step_response}).
+Si nota immediatamente come essa vada ad intersecare le patch sia rossa che verde. Ciò accade perché il regolatore è progettato sul sistema linearizzato, il quale non cattura il comportamento non lineare del sistema
+e questo non ci assicura che il sistema non lineare rispetti precisamente le specifiche imposte per il sistema linearizzato.
+\`E però possibile osservare la somiglianza fra la risposta del sistema non lineare e quella del sistema linearizzato, mostrata nella figura \ref*{fig:confronto}.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=0.75\linewidth]{./images/stepRespNonLinUni.png}
 	\caption{Risposta del sistema non lineare ad un gradino unitario.}
 	\label{fig:step_response_non_lin_uni}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.75\linewidth]{./images/confronto.png}
+	\caption{Confronto fra la risposta del sistema non lineare e lineare ad un gradino unitario.}
+	\label{fig:confronto}
 \end{figure}
 
 \section{Punti opzionali}
