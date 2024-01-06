@@ -43,6 +43,7 @@ s = tf('s');
 
 modello = ss(A_e, B_e, C_e, D_e);
 G = tf(modello);
+
 Gdisp = zpk(G);
 Gdisp.DisplayFormat = 'Frequency';
 display(Gdisp);
@@ -114,8 +115,10 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 
 ylim([0,LV*2]);
 
-Legend_step = ["Risposta al gradino (lineare)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+Legend_step = ["Risposta al gradino (lin.)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
+xlabel('t(s)');
+ylabel('\theta (rad)');
 
 %% Check disturbo in uscita
 
@@ -131,6 +134,8 @@ hold on, grid on, zoom on
 plot(tt,dd,'m')
 plot(tt,y_d,'b')
 legend('d(t)','y_d(t)')
+xlabel('t(s)');
+ylabel('\theta (rad)');
 
 %% Check disturbo di misura
 figure();
@@ -143,18 +148,15 @@ hold on, grid on, zoom on
 plot(tt,nn,'m')
 plot(tt,y_n,'b')
 legend('n(t)','y_n(t)')
+xlabel('t(s)');
+ylabel('\theta (rad)');
 
 %% Check prestazioni linearizzato
 x_sim = x_e;
 W_sim = W;
 T_simulation = 10;
 out = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
-data = out.y_sim.Data(:);
-LV = data(end);
-
-figure();
-hold on; zoom on; grid on;
-plot(out.y_sim.Time, data);
+LV = out.y_sim.Data(end);
 
 T_simulation = 3*T_a5;
 out = sim("SdC_lineare_progetto.slx","StopTime",num2str(T_simulation));
@@ -174,20 +176,17 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 
 ylim([0,LV*2]);
 
-Legend_step = ["Risposta al gradino (linearizzato)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+Legend_step = ["Risposta al gradino (lin. con dist.)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
+xlabel('t(s)');
+ylabel('\theta (rad)');
 
 %% Check prestazioni non linearizzato
 x_sim = x_e;
 W_sim = W;
 T_simulation = 10;
 out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
-data = out.y_sim.Data(:) - theta_e;
-LV = data(end);
-
-figure();
-hold on; zoom on; grid on;
-plot(out.y_sim.Time, data);
+LV = out.y_sim.Data(end) - theta_e;
 
 T_simulation = 3*T_a5;
 out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
@@ -207,20 +206,18 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 
 ylim([0,LV*2]);
 
-Legend_step = ["Risposta al gradino (non lineare)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+Legend_step = ["Risposta al gradino (non lin.)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
 
 %% Check prestazioni non linearizzato con disturbi
 x_sim = x_e;
 W_sim = W;
+
 T_simulation = 10;
 out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
-data = out.y_sim.Data(:) - theta_e;
-LV = data(end);
-
-figure();
-hold on; zoom on; grid on;
-plot(out.y_sim.Time, data);
+LV = out.y_sim.Data(end) - theta_e;
 
 T_simulation = 3*T_a5;
 out = sim("SdC_progetto.slx","StopTime",num2str(T_simulation));
@@ -240,8 +237,10 @@ patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],
 
 ylim([0,LV*2]);
 
-Legend_step = ["Risposta al gradino (non lineare con disturbi)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
+Legend_step = ["Risposta al gradino (non lin. senza dist.)"; "Vincolo sovraelongazione"; "Vincolo tempo di assestamento"];
 legend(Legend_step);
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
 
 %% Confronto
 T_simulation = 0.01; 
@@ -259,8 +258,10 @@ plot(outl.y_sim,'b');
 plot(out.y_sim.Time, data, 'r');
 plot(out_nodist.y_sim.Time, data_nodist, 'm');
 
-Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lin. con disturbi)"; "Risposta al gradino (non lin. no disturbi)"];
+Legend_step = ["Risposta al gradino (lin.)"; "Risposta al gradino (non lin. con dist.)"; "Risposta al gradino (non lin. senza dist.)"];
 legend(Legend_step);
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
 
 %% Confronto regime
 T_simulation = 10; 
@@ -278,9 +279,10 @@ plot(outl.y_sim,'b');
 plot(out.y_sim.Time, data, 'r');
 plot(out_nodist.y_sim.Time, data_nodist, 'm');
 
-Legend_step = ["Risposta al gradino (lineare)"; "Risposta al gradino (non lin. con disturbi)"; "Risposta al gradino (non lin. no disturbi)"];
+Legend_step = ["Risposta al gradino (lin.)"; "Risposta al gradino (non lin. con dist.)"; "Risposta al gradino (non lin. senza dist.)"];
 legend(Legend_step);
-
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
 %% Punti opzionali
 
 % Angolo iniziale
@@ -288,93 +290,93 @@ figure();
 hold on, grid on, zoom on;
 
 W_sim = 0;
-theta_range = -180:45:180;
+theta_range = -pi:pi/3:pi;
 for dtheta = theta_range
-    x_sim = x_e + [deg2rad(dtheta); 0];
+    x_sim = x_e + [dtheta; 0];
     out = sim("SdC_progetto_fast.slx","StopTime","8");
     data = out.y_sim.Data(:) - theta_e;
-    plot(out.y_sim.Time, rad2deg(data));
+    plot(out.y_sim.Time, data);
 end
-yline(rad2deg([-e_max e_max]), 'HandleVisibility', 'off');
-legendCell = strcat('d\theta = ',string(num2cell(theta_range)));
+yline([-e_max e_max], 'HandleVisibility', 'off');
+legendCell = [  "\Delta\theta = -\pi";   "\Delta\theta = -2\pi/3"; "\Delta\theta = -\pi/3";  "\Delta\theta = 0"; 
+                "\Delta\theta = \pi/3"; "\Delta\theta = 2\pi/3"; "\Delta\theta = \pi"];
 legend(legendCell);
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
 
 % Velocità iniziale
 figure();
 hold on, grid on, zoom on;
 
 W_sim = 0;
-omega_range = 10.^(-1:6);
-omega_range = [-omega_range omega_range];
+omega_range = 10.^(-1:3);
 for vel = omega_range
-    x_sim = x_e + [0; deg2rad(vel)];
+    x_sim = x_e + [0; vel];
     out = sim("SdC_progetto_fast.slx","StopTime","8");
     data = out.y_sim.Data(:) - theta_e;
-    plot(out.y_sim.Time, rad2deg(data));
+    p = plot(out.y_sim.Time, data);
+
+    x_sim = x_e + [0; -vel];
+    out = sim("SdC_progetto_fast.slx","StopTime","8");
+    data = out.y_sim.Data(:) - theta_e;
+    plot(out.y_sim.Time, data, 'Color', p.Color, 'HandleVisibility', 'off');
 end
-yline(rad2deg([-e_max e_max]), 'HandleVisibility', 'off');
-%legendCell = strcat('d\omega = ',string(num2cell(omega_range)));
-%legend(legendCell);
+yline([-e_max e_max], 'HandleVisibility', 'off');
+legendCell = strcat('\Delta\omega = \pm',string(num2cell(omega_range)));
+legend(legendCell);
+xlabel('t(s)');
+ylabel('\theta - \theta_e (rad)');
+
+
+%% Gradini senza disturbi - W in [0, 3]
+
+x_sim = x_e;
+W_range = 0.01:0.01:3;
+LVs = cell(length(W_range), 1);
+TAs = cell(length(W_range), 1);
+SEs = cell(length(W_range), 1);
+
+T_simulation = 10;
+for i = 1:length(W_range)
+    W_sim = W_range(i);
+    disp(W_sim);
+    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
+    data = out.y_sim.Data(:) - theta_e;
+
+    LVs{i} = data(end);
+    t_ind = find(data >= LVs{i}*1.05 | data <= LVs{i}*0.95, 1, 'last');
+    TAs{i} = out.y_sim.Time(t_ind + 1); % +1 perchè a t_ind è fuori dal range
+    SEs{i} = max(data)/LVs{i} - 1;
+end
+
+% Plot  gradini
+figure();
+data = abs(cell2mat(LVs) - W_range');
+plot(W_range, data);
+yline(e_max);
+xlabel('W(rad)');
+ylabel('e_{\infty}(rad)');
+grid on, hold on, zoom on;
+
+figure();
+plot(W_range, cell2mat(SEs) * 100);
+yline(S * 100);
+xlabel('W(rad)');
+ylabel('Sovraelungazione %');
+grid on, hold on, zoom on;
+
+figure();
+semilogy(W_range, cell2mat(TAs));
+yline(T_a5);
+xlabel('W(rad)');
+ylabel('Tempo di assestamento(log_10 s)');
+grid on, hold on, zoom on;
 
 %% Animazione
 x_sim = x_e;
 W_sim = W;
 out = sim("SdC_progetto.slx","StopTime","0.01");
 animation(out.y_sim);
-
-%% Gradini
-
-x_sim = x_e;
-w_range = -0.1:0.1:0.5;
-LVs = cell(length(w_range), 1);
-
-%prestazioni statiche
-figure();
-hold on, grid on, zoom on;
-
-T_simulation = 10;
-for i = 1:length(w_range)
-    W_sim = W + w_range(i);
-
-    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
-    data = out.y_sim.Data(:) - theta_e;
-    p = plot(out.y_sim.Time, data, 'LineWidth',1.0);
-    LVs{i} = data(end);
-
-    line([0.9*T_simulation T_simulation],[W_sim-e_max W_sim-e_max],'HandleVisibility','off', 'Color', p.Color); % errore a regime
-    line([0.9*T_simulation T_simulation],[W_sim+e_max W_sim+e_max],'HandleVisibility','off', 'Color', p.Color); 
-end
-legendCell = strcat('W = ',string(num2cell(W+w_range)));
-legend(legendCell);
-
-
-% prestazioni dinamiche
-
-T_simulation = 3*T_a5;
-figure();
-hold on, grid on, zoom on;
-for i = 1:length(w_range)
-    clf;
-    hold on, grid on, zoom on;
-    
-    W_sim = W + w_range(i);
-
-    out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
-    data = out.y_sim.Data(:) - theta_e;
-
-    p = plot(out.y_sim.Time, data);
-    LV = LVs{i};
-    patch([0,T_simulation,T_simulation,0],[LV*(1+S),LV*(1+S),LV*2,LV*2],'r','FaceAlpha',0.3,'EdgeAlpha',0.5);
-
-    % vincolo tempo di assestamento al 5%
-    patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1-0.05),LV*(1-0.05),0,0],'g','FaceAlpha',0.1,'EdgeAlpha',0.5);
-    patch([T_a5,T_simulation,T_simulation,T_a5],[LV*(1+0.05),LV*(1+0.05),LV*2,LV*2],'g','FaceAlpha',0.1,'EdgeAlpha',0.1);
-
-    ylim([0,LV*2+0.01]);
-
-    legend(strcat('W = ', num2str(W + w_range(i))), 'Vincolo sovraelungazione', 'Vincolo assestamento');
-    pause;
-end
 
 %% Funzioni
 function [out] = noise_gen(omega)
@@ -388,8 +390,11 @@ function [out] = noise_gen(omega)
 end
 
 function [] = animation(y_sim)
-    thetas = y_sim.Data;
-    tt = y_sim.Time;
+    frame_length = max(floor(length(y_sim.Data)/60), 1); %circa 30fps per 2s
+    thetas = y_sim.Data(1:frame_length:end);
+    tt = y_sim.Time(1:frame_length:end);
+
+
     wheel_center = [0 2];
     wheel_r = 0.6;
     vbarL_bottom = [2.4 0];
@@ -401,7 +406,6 @@ function [] = animation(y_sim)
 
     % circle: y^2 + (x-2)^2 = 4
     f = figure();
-
     for i=1:length(thetas)
         clf(f);
         grid on;
@@ -458,10 +462,10 @@ function [] = animation(y_sim)
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
         if i == 1
             pause;
+        else 
+            pause((tt(i)-tt(i-1)) * 200);
         end
-        pause(tt * 0.1);
     end  
-    pause;
 end
 
 
