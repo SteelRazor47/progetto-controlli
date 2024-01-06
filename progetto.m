@@ -339,7 +339,7 @@ SEs = cell(length(W_range), 1);
 T_simulation = 10;
 for i = 1:length(W_range)
     W_sim = W_range(i);
-    disp(W_sim);
+    %disp(W_sim);
     out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
     data = out.y_sim.Data(:) - theta_e;
 
@@ -369,7 +369,7 @@ figure();
 semilogy(W_range, cell2mat(TAs));
 yline(T_a5);
 xlabel('W(rad)');
-ylabel('Tempo di assestamento(log_10 s)');
+ylabel('Tempo di assestamento(log_{10} s)');
 grid on, hold on, zoom on;
 
 %% Animazione
