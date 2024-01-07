@@ -80,14 +80,14 @@ Il progetto riguarda il controllo di un sistema a meccanismo motorizzato di Figu
 		J(\theta)\dot{\omega} = C_m - \beta\omega - k\theta 
 	\end{align}
 	\begin{align}
-		J(\theta) = J_0 + \sum_{n = 0}^{4}J_i\cos (i\theta +\psi_i)
+		J(\theta) = J_0 + \sum_{i = 0}^{4}J_i\cos (i\theta +\psi_i)
 	\end{align}
 \end{subequations}
 %
 dove $\omega$(t) rappresenta la velocità angolare e in cui:
 \begin{itemize}
 	\item il momento d'interzia ridotto al movente $J(\theta)$ è una funzione periodica di periodo 2$\pi$;
-	\item $C_m$ è la coppia generata dal motore elettrico;
+	\item $C_m$ è la coppia generata dal motore elettrico, e si considera come input di controllo;
 	\item $\beta$ è l'attrito viscoso;
 	\item k è il coefficiente di elasticità del disco;
 \end{itemize}
@@ -190,29 +190,28 @@ L'evoluzione del sistema espressa nelle variabili alle variazioni pu\`o essere a
 \end{subequations}
 %
 dove le matrici $A_e$, $B_e$, $C_e$ e $D_e$ vengono calcolate come
-\\[0.5em]
-
-\begin{subequations}\label{eq:matrices}\centering
-	$A_e = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+\\
+\begin{gather}\label{eq:matrices}\centering
+	A_e = \frac{\partial f(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
 			x = x_e
 			\\
-			u = u_e \end{smallmatrix}}$
+			u = u_e \end{smallmatrix}}
 	\quad
-	$B_e = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+	B_e = \frac{\partial f(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
 			x = x_e
 			\\
-			u = u_e \end{smallmatrix}}$
+			u = u_e \end{smallmatrix}}
 	\quad
-	$C_e = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
+	C_e = \frac{\partial h(x, u)}{\partial x} \Bigg|_{\begin{smallmatrix}
 			x = x_e
 			\\
-			u = u_e \end{smallmatrix}}$
+			u = u_e \end{smallmatrix}}
 	\quad
-	$D_e = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
+	D_e = \frac{\partial h(x, u)}{\partial u} \Bigg|_{\begin{smallmatrix}
 			x = x_e
 			\\
-			u = u_e \end{smallmatrix}}$
-\end{subequations}
+			u = u_e \end{smallmatrix}}
+\end{gather}
 %
 \section{Calcolo Funzione di Trasferimento}
 
@@ -241,7 +240,7 @@ In Figura \ref{fig:G_bode} mostriamo il corrispondente diagramma di Bode.
 
 Le specifiche da soddisfare sono
 \begin{itemize}
-	\item[1)] Errore a regime $|e_{\infty}| \leq e^{\star}$ in risposta a un gradino $\omega (t) = 1(t)$ e $d(t)=1(t)$
+	\item[1)] Errore a regime $|e_{\infty}| \leq e^{\star} = 0.04$ in risposta a un gradino $\omega (t) = 1(t)$ e $d(t)=1(t)$
 	\item[2)] Per garantire una certa robustezza del sistema si deve avere un margine di fase $M_f \geq 30^{\degree}$.
 	\item[3)] Il sistema può accettare una sovraelongazione percentuale al massimo del 10\% : S\% $\leq 10\%$.
 	\item[4)] Il tempo di assestamento alla $\epsilon_{\%}$ = 5\% deve essere inferiore al valore fissato: $T_{a, \epsilon} = 0.008s$ .
@@ -249,7 +248,7 @@ Le specifiche da soddisfare sono
 	\item[6)] Il rumore sull'uscita n(t), con una banda limitata nel range di pulsazioni $[5 \cdot 10^4, 5 \cdot 10^6]$, deve essere abbattuto di almeno 65 dB.
 \end{itemize}
 %
-Andiamo ad effettuare la mappatura punto per punto le specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore.  
+Andiamo ad effettuare la mappatura punto per punto delle specifiche richieste, tenendo a mente la fisica realizzabilità del regolatore.  
 
 Pertanto, in Figura \ref{fig:G_bode_specifiche}, mostriamo il diagramma di Bode della funzione di trasferimento $G(s)$ con le zone proibite emerse dalla mappatura delle specifiche.
 \begin{figure}[h!]
@@ -273,7 +272,7 @@ Consideriamo quindi che:
 \begin{align}
 	\mu_s \geq \mu^{\star} = \frac{D+W}{e^{\star}}.
 \end{align}
-Con D e W rispettive ampiezza dei gradini di disturbo sull'uscita e ingresso.\\
+Con D e W rispettive ampiezza dei gradini di ingresso e di disturbo sull'uscita.\\
 Per determinare $\mu_s$ bisogna anche considerare la specifica sull'attenuazione di d(t):
 \begin{align}
 	\mu_s \geq \mu_{sd} = 10^{\frac{A_d}{20}}.
@@ -301,7 +300,7 @@ In questa sezione, progettiamo il regolatore dinamico $R_d(s)$.
 Dalle analisi fatte in Sezione~\ref{sec:static_regulator}, notiamo di essere nello Scenario di tipo B. Dunque, progettiamo $R_d(s)$ ricorrendo a una rete anticipatrice.\\
 A questo scopo, calcoliamo il margine di fase per rispettare le specifiche:
 \begin{align}
-	\xi^{\star} = \sqrt{\frac{\log{S}^2}{\pi^2 + \log{S}^2}}.
+	\xi^{\star} = \sqrt{\frac{\ln^2{S}}{\pi^2 + \ln^2{S}}}.
 	\\[0.5em]
 	Mf = max (\xi^{\star}, 30).
 \end{align}
@@ -356,7 +355,7 @@ e un regolatore dinamico $R_d(s)$ che facesse s\`i che il sistema rispettasse un
 \section{Test sul sistema non lineare}
 
 In questa sezione, testiamo l'efficacia del controllore progettato sul modello non lineare, tenendo anche conto della presenza di $d(t)$ ed $n(t)$. 
-Il test \`e stato effettuato utilizzando un modello Simulink, come mostrato nella figura \ref*{fig:simulink}.
+Il test \`e stato effettuato utilizzando un modello Simulink, come mostrato nella figura \ref{fig:simulink}.
 
 Pi\`u nello specifico,
 da sinistra a destra si trovano un blocco generatore di segnali a gradino al quale viene sottratto il valore dell'uscita precedente (in modo da realizzare il controllo in retroazione), ed in seguito anche il disturbo di misura $n(t)$. 
@@ -373,8 +372,8 @@ dove le viene sottratto il valore di $x_e$, ossia l'equilibrio per lo stato. Que
 	\label{fig:simulink}
 \end{figure}
 
-Nella figura \ref*{fig:step_response_non_lin_uni} si mostra la risposta del sistema non lineare ad un gradino unitario, calcolata utilizzando il sistema spiegato in precedenza (figura \ref*{fig:simulink}).
-\`E bene specificare che tutti i grafici riguardantila risposta a gradino del sistema non lineare sono stati traslati in basso del valore di $x_e$ al fine di ottenere una visualizzazione che partisse da $0$, così da semplificare
+Nella figura \ref{fig:step_response_non_lin_uni} si mostra la risposta del sistema non lineare ad un gradino unitario, calcolata utilizzando il sistema spiegato in precedenza (figura \ref{fig:simulink}).
+\`E bene specificare che tutti i grafici riguardanti la risposta a gradino del sistema non lineare sono stati traslati in basso del valore di $x_e$ al fine di ottenere una visualizzazione che partisse da $0$, così da semplificare
 e rendere più immediato il confronto con la risposta del sistema linearizzato.
 
 Si nota immediatamente come essa vada ad intersecare le patch sia rossa che verde. Ciò accade perché il regolatore è progettato sul sistema linearizzato, il quale non cattura il comportamento non lineare del sistema
@@ -387,9 +386,9 @@ e questo non ci assicura che il sistema non lineare rispetti precisamente le spe
 	\label{fig:step_response_non_lin_uni}
 \end{figure}
 
-Nella figura \ref*{fig:confronto} è possibile osservare come, per tempi brevi, la risposta al gradino del sistema linearizzato e del sistema non lineare (sia in presenza che in assenza di disturbi) siano molto simili.
-Ciò non si verifica nel caso di tempi più lunghi, dove la presenza di disturbi porta l'uscita del sistema non lineare a divergere dal riferimento, assumendo un comportamento non stabile - cosa che non avviene in assenza di distubi -
-come mostrato nella figura \ref*{fig:confrontoReg}.
+Nella figura \ref{fig:confronto} è possibile osservare come, per tempi brevi, la risposta al gradino del sistema linearizzato e del sistema non lineare (sia in presenza che in assenza di disturbi) siano molto simili.
+Ciò non si verifica nel caso di tempi più lunghi, dove la presenza di disturbi porta l'uscita del sistema non lineare a divergere dal riferimento, assumendo un comportamento non stabile - cosa che non avviene in assenza di disturbi -
+come mostrato nella figura \ref{fig:confrontoReg}.
 
 \begin{figure}[h!]
 	\centering
