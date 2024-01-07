@@ -372,6 +372,14 @@ xlabel('W(rad)');
 ylabel('Tempo di assestamento(log_{10} s)');
 grid on, hold on, zoom on;
 
+%% Range di gradini validi
+error = cell2mat(LVs) - W_range';
+W_err_range = W_range(error < e_max);
+W_se_range = W_range(cell2mat(SEs) < S);
+W_ta_range = W_range(cell2mat(TAs)< T_a5);
+W_range_valid = intersect(intersect(W_err_range, W_se_range), W_ta_range);
+disp(W_range_valid);
+
 %% Animazione
 x_sim = x_e;
 W_sim = W;
@@ -390,7 +398,7 @@ function [out] = noise_gen(omega)
 end
 
 function [] = animation(y_sim)
-    frame_length = max(floor(length(y_sim.Data)/60), 1); %circa 30fps per 2s
+    frame_length = max(floor(length(y_sim.Data)/60), 1); %circa 15fps per 4s
     thetas = y_sim.Data(1:frame_length:end);
     tt = y_sim.Time(1:frame_length:end);
 
@@ -447,23 +455,30 @@ function [] = animation(y_sim)
 
         pos = [pin1-0.05 2*0.05 2*0.05];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(pin1(1), pin1(2)+0.3, 'A');
 
         pos = [hbar_left-0.05 2*0.05 2*0.05];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(hbar_left(1), hbar_left(2)+0.3, 'B');
 
         pos = [vbarL_top-0.09 2*0.09 2*0.09];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(vbarL_top(1), vbarL_top(2)+0.3, 'C');
         pos = [vbarR_top-0.09 2*0.09 2*0.09];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(vbarR_top(1), vbarR_top(2)+0.3, 'D');
 
         pos = [vbarL_bottom-0.09 2*0.09 2*0.09];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(vbarL_bottom(1), vbarL_bottom(2)+0.3, 'E');
         pos = [vbarR_bottom-0.09 2*0.09 2*0.09];
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
+        %text(vbarR_bottom(1), vbarR_bottom(2)+0.3, 'F');
+
         if i == 1
             pause;
         else 
-            pause((tt(i)-tt(i-1)) * 200);
+            pause((tt(i)-tt(i-1)) * 400);
         end
     end  
 end

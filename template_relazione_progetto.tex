@@ -414,9 +414,9 @@ come mostrato nella figura \ref{fig:confrontoReg}.
 \subsection{Animazione}
 
 L'animazione del sistema controllato è stata implementata in Matlab disegnando un grafico frame per frame in base all'angolo $\theta$ simulato.
-Partendo da 3 posizioni fisse, ossia il centro della ruota(?) e i cardini(?) delle travi fissati al suolo, e in base all'angolo $\theta$ vengono calcolate le posizioni dei 3 cardini liberi.
+Partendo da tre posizioni fisse, ossia il centro del disco e le due giunzioni E e F, e in base all'angolo $\theta$ vengono calcolate le posizioni delle quattro giunzioni rimaste(A, B, C, D).
 
-In particolare si noti come i due cardini della trave(?) connessa alla ruota devono appartenere a due circonferenze. La prima è centrata chiaramente sul centro della ruota, per la seconda si noti che essendo il corpo rigido un parallelogramma, i tre cardini della trave orizzontale percorrono tutti delle circonferenze con raggio pari alla lunghezza delle travi verticali. È quindi possibile individuare una posizione univoca del secondo cardine in funzione della posizione del primo e della lunghezza della trave.
+In particolare si noti come le giunzioni A e B debbano appartenere a due circonferenze. La prima è centrata chiaramente sul centro della ruota e determina la posizione di A, per la seconda si noti che essendo il corpo rigido un parallelogramma, le tre giunzioni B, C e D della trave orizzontale percorrono tutti delle circonferenze con raggio pari alla lunghezza delle travi verticali. È quindi possibile individuare una posizione univoca per B in funzione di A e della lunghezza della trave.
 
 \begin{figure}[h!]
 	\centering
@@ -426,6 +426,12 @@ In particolare si noti come i due cardini della trave(?) connessa alla ruota dev
 \end{figure}
 
 \subsection{Secondo punto}
+
+Il regolatore realizzato è stato testato con un riferimento $\theta(t)=\theta_e$ sul sistema non lineare senza disturbi al variare dello stato iniziale. Essendo il regolatore progettato sul sistema linearizzato attorno a $\theta_e=\pi/3$, il riferimento in ingresso è data da $w(t)=\delta y=0$. Per variare lo stato iniziale del sistema è sufficiente variare lo stato iniziale dell'integratore in uscita al sistema dinamico nel modello in figura \ref{fig:simulink}.
+
+Il sistema è considerato convergente al riferimento se soddisfa l'errore a regime di $e_{\infty} = 0.04$, analogamente alla progettazione del regolatore.
+
+Il sistema non lineare rimane stabile e converge a $\theta_e$ per ogni variazione ragionevole dell'angolo e della velocità angolare iniziali, come mostrato nei grafici \ref{fig:theta_iniziali} e \ref{fig:omega_iniziali}, si noti che l'angolo in uscita è traslato in basso di $\theta_e$ per facilitare la lettura.
 
 \begin{figure}[h!]
 	\centering
@@ -438,7 +444,7 @@ In particolare si noti come i due cardini della trave(?) connessa alla ruota dev
 	\begin{subfigure}[b]{0.4\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{./images/omega_iniziali.png}
-		\caption{Andamento di $\delta y$ al variare della velocità angolare iniziale, $0.1 \le \lvert\omega\rvert \le 10^6$}
+		\caption{Andamento di $\delta y$ al variare della velocità angolare iniziale}
 		\label{fig:omega_iniziali}
 	\end{subfigure}
 	
@@ -446,50 +452,42 @@ In particolare si noti come i due cardini della trave(?) connessa alla ruota dev
 	\label{fig:stato_iniziale}
 \end{figure}
 
-Il regolatore realizzato è stato testato con un riferimento $\theta(t)=\theta_e$ sul sistema non lineare al variare dello stato iniziale. Essendo il regolatore progettato sul sistema linearizzato attorno a $\theta_e=\pi/3$, il riferimento in ingresso è data da $w(t)=\delta y=0$. Per variare lo stato iniziale del sistema è sufficiente variare lo stato iniziale dell'integratore in uscita al sistema dinamico nel modello in figura \ref{fig:simulink}.
-
-Il sistema è considerato convergente al riferimento se soddisfa l'errore a regime di $e_{\infty} = 0.04$, analogamente alla progettazione del regolatore.
-
-Il sistema non lineare rimane stabile e converge a $\theta_e$ per ogni variazione ragionevole dell'angolo e della velocità angolare iniziali, come mostrato nelle figure \ref{fig:theta_iniziali} e \ref{fig:omega_iniziali}.
-
-
 
 \subsection{Terzo punto}
 
-Per testare se il sistema non lineare controllato rispetta le specifiche in risposta a diversi gradini, sono necessarie due simulazioni. La prima, di lunga durata, controlla se la risposta rispetta l'errore a regime di 0.04. La seconda per verificare le prestazioni dinamiche delle risposte.
-Per quanto riguarda la precisione dinamica i gradini nell'intervallo [1.1, 1.4) rispettano i vincoli di sovraelungazione e tempo di assestamento al 5\%(figure \ref{fig:gradini_dinamico_low} e \ref{fig:gradini_dinamico_high}).
-In questo intervallo tutti i gradini rispettano l'errore a regime, mostrato in figura \ref{fig:gradini_statico}.
+Per capire se il sistema non lineare controllato, senza disturbi, rispetta le specifiche in risposta a diversi gradini, sono stati testati gradini nel range di ampiezza $W \in [0,3]$ con risoluzione $\Delta W = 0.01$. I valori di errore a regime, sovraelungazione e tempo di assestamento sono mostrati rispettivamente nei grafici \ref{fig:gradini_err}, \ref{fig:gradini_se} e \ref{fig:gradini_ta} in funzione di $W$. Si noti che il grafico \ref{fig:gradini_ta} è in scala semilogaritmica. \\
+Intersecando gli intervalli di $W$ per cui le specifiche sono soddisfatte, si trova che il regolatore è efficace, in assenza di disturbi, per $W \in [0, 0.09] \cup [1.02, 1.37]$.
 
 \begin{figure}[h!]
 	\centering
 	\begin{subfigure}[b]{0.3\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{./images/gradini_statico.png}
-		\caption{Precisione statica}
-		\label{fig:gradini_statico}
+		\includegraphics[width=\textwidth]{./images/gradini_err.png}
+		\caption{Errore a regime}
+		\label{fig:gradini_err}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{./images/gradini_dinamico_low.png}
-		\caption{Precisione dinamica}
-		\label{fig:gradini_dinamico_low}
+		\includegraphics[width=\textwidth]{./images/gradini_se.png}
+		\caption{Sovraelungazione \%}
+		\label{fig:gradini_se}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.3\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{./images/gradini_dinamico_high.png}
-		\caption{Precisione dinamica}
-		\label{fig:gradini_dinamico_high}
+		\includegraphics[width=\textwidth]{./images/gradini_ta.png}
+		\caption{Tempo di assestamento al 5\%}
+		\label{fig:gradini_ta}
 	\end{subfigure}
 	
-	\caption{Verifica specifiche}
-	\label{fig:specifiche_gradini}
+	\caption{Risposta a gradini con ampiezza $ W \in [0,3]$ }
+	\label{fig:risposte_gradini}
 \end{figure}
 
 \section{Conclusioni}
 
-In conclusione, sebbene il regolatore progettato sia efficiace e rispetti le specifiche sul sistema linearizzato, esso non offre le stesse prestazioni nel controllo del sistema non lineare. Non viene infatti rispettata le specifiche dinamiche sul tempo di assestamento al 5\% e sulla sovraelungazione per $w(t) = 1(t)$. Cioè è dovuto al comportamento non lineare del sistema, non catturabile nella linearizzazione, che porta a una differenza nell'inseguimento del riferimento.
-Inoltre il regolatore non è in grado di attenuare correttamente i disturbi di misura nel sistema non lineare, il che porta l'uscita a divergere dal riferimento.
+In conclusione, sebbene il regolatore progettato sia efficiace e rispetti le specifiche sul sistema linearizzato, esso non offre le stesse prestazioni nel controllo del sistema non lineare. Non viene infatti rispettata la specifica dinamica sulla sovraelungazione per $w(t) = 1(t)$. Cioè è dovuto al comportamento non lineare del sistema, non catturabile nella linearizzazione, che porta a una differenza nell'inseguimento del riferimento.
+Inoltre il regolatore non è in grado di attenuare correttamente i disturbi di misura nel sistema non lineare, il che porta l'uscita a divergere dal riferimento per $t \gg T_{a,5}$.
 Il regolatore è però, in assenza di disturbi, in grado di riportare il sistema non lineare alle condizioni di equilibrio per ogni angolo e velocità inziale ragionevoli.
-Inoltre, sebbene il controllo non sia efficace per un gradino di ampiezza $W=1$, lo diventa per tutti i gradini con ampiezza nel range $[1.1, 1.4)$.
+Inoltre, sebbene il controllo non sia efficace per un gradino di ampiezza $W=1$, lo diventa per tutti i gradini con ampiezza nel range $W \in [0, 0.09] \cup [1.02, 1.37]$.
 
 \end{document}
