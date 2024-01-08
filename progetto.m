@@ -337,7 +337,7 @@ TAs = cell(length(W_range), 1);
 SEs = cell(length(W_range), 1);
 
 T_simulation = 10;
-fprintf('00.00%%\n');
+fprintf('000.00%%\n');
 for i = 1:length(W_range)
     W_sim = W_range(i);
     out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
@@ -349,8 +349,8 @@ for i = 1:length(W_range)
     SEs{i} = max(data)/LVs{i} - 1;
 
     %progress bar
-    fprintf(repmat('\b', 1, 6));
-    fprintf("%.2f%%\n", W_sim/3*100);
+    fprintf(repmat('\b', 1, 7));
+    fprintf("%05.2f%%\n", W_sim/3*100);
 end
 
 % Plot  gradini
