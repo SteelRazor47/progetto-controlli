@@ -337,9 +337,9 @@ TAs = cell(length(W_range), 1);
 SEs = cell(length(W_range), 1);
 
 T_simulation = 10;
+fprintf('00.00%%\n');
 for i = 1:length(W_range)
     W_sim = W_range(i);
-    %disp(W_sim);
     out = sim("SdC_progetto_fast.slx","StopTime",num2str(T_simulation));
     data = out.y_sim.Data(:) - theta_e;
 
@@ -347,6 +347,10 @@ for i = 1:length(W_range)
     t_ind = find(data >= LVs{i}*1.05 | data <= LVs{i}*0.95, 1, 'last');
     TAs{i} = out.y_sim.Time(t_ind + 1); % +1 perchè a t_ind è fuori dal range
     SEs{i} = max(data)/LVs{i} - 1;
+
+    %progress bar
+    fprintf(repmat('\b', 1, 6));
+    fprintf("%.2f%%\n", W_sim/3*100);
 end
 
 % Plot  gradini
@@ -412,7 +416,7 @@ function [] = animation(y_sim)
     bar_c = [2 0];
     pinbar_length = norm((wheel_center+[0 wheel_r]) - (bar_c + [0 vbar_length]));
 
-    % circle: y^2 + (x-2)^2 = 4
+    gifFile = 'animazione.gif';
     f = figure();
     for i=1:length(thetas)
         clf(f);
@@ -475,8 +479,9 @@ function [] = animation(y_sim)
         rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [0 0 0 0.1]);
         %text(vbarR_bottom(1), vbarR_bottom(2)+0.3, 'F');
 
+        exportgraphics(gcf, gifFile, Append=true);
         if i == 1
-            pause;
+            pause(1);
         else 
             pause((tt(i)-tt(i-1)) * 400);
         end
